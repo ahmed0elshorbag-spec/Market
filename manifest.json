@@ -1,0 +1,9 @@
+{
+  "name": "Market",
+  "short_name": "Market",
+  "start_url": "/Market/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": []
+}
