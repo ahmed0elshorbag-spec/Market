@@ -1,8 +1,8 @@
 /* =========================================
-   دوال مساعدة لتأمين وتنسيق البيانات
+   1. دوال مساعدة لتأمين وتنسيق البيانات
 ========================================= */
 
-// دالة لتنظيف النصوص للحماية من ثغرات XSS
+// تنظيف النصوص للحماية من ثغرات XSS
 function escapeHtml(str) {
     if (!str) return "";
     return String(str)
@@ -13,19 +13,46 @@ function escapeHtml(str) {
         .replace(/'/g, "&#039;");
 }
 
-// دالة لتنسيق العملة
+// تنسيق المبالغ المالية
 function money(amount) {
     const num = Number(amount) || 0;
-    return num.toFixed(2) + " ج.م";
+    return num.toFixed(2) + " ج";
 }
 
-// دالة لاستخراج تاريخ اليوم بصيغة YYYY-MM-DD
+// استخراج التاريخ بصيغة YYYY-MM-DD
 function getFormattedDate(dateObj = new Date()) {
     return dateObj.toISOString().split("T")[0];
 }
 
+// حفظ بيانات المخزون بالأمان
+function saveProductsData() {
+    try {
+        if (typeof saveProducts === "function") {
+            saveProducts();
+        } else if (typeof products !== "undefined" && Array.isArray(products)) {
+            localStorage.setItem("products", JSON.stringify(products));
+        }
+    } catch (error) {
+        console.error("خطأ في حفظ المخزون:", error);
+    }
+}
+
+// حساب إجمالي سعر شراء المخزون كامل لكل الأصناف بسعر الجملة
+function getTotalInventoryCost() {
+    if (typeof products === "undefined" || !Array.isArray(products)) {
+        return 0;
+    }
+
+    return products.reduce((total, product) => {
+        const quantity = Number(product.quantity) || 0;
+        const buyPrice = Number(product.buy) || 0;
+        return total + (quantity > 0 ? quantity * buyPrice : 0);
+    }, 0);
+}
+
+
 /* =========================================
-   البيع الفعلي
+   2. إدارة المبيعات والمخزون
 ========================================= */
 
 function sellProduct(product, salePrice = null) {
@@ -34,7 +61,6 @@ function sellProduct(product, salePrice = null) {
     const quantity = Number(product.quantity) || 0;
     const buy = Number(product.buy) || 0;
 
-    // تم التعديل: التمييز بين عدم إدخال سعر والمبيعات مجانية (0)
     let sell;
     if (salePrice !== null && salePrice !== undefined && salePrice !== "") {
         sell = Number(salePrice);
@@ -63,8 +89,8 @@ function sellProduct(product, salePrice = null) {
         sell: sell,
         profit: sell - buy,
         quantity: 1,
-        date: getFormattedDate(now), // حفظ التاريخ بصيغة YYYY-MM-DD للتجميع الصحيح
-        timestamp: now.toISOString() // حفظ التوقيت الكامل للتحليل
+        date: getFormattedDate(now),
+        timestamp: now.toISOString()
     });
 
     /* حفظ المخزون */
@@ -72,26 +98,6 @@ function sellProduct(product, salePrice = null) {
 
     return true;
 }
-
-/* =========================================
-   حفظ بيانات المخزون الأمان
-========================================= */
-
-function saveProductsData() {
-    try {
-        if (typeof saveProducts === "function") {
-            saveProducts();
-        } else if (typeof products !== "undefined" && Array.isArray(products)) {
-            localStorage.setItem("products", JSON.stringify(products));
-        }
-    } catch (error) {
-        console.error("خطأ في حفظ المخزون:", error);
-    }
-}
-
-/* =========================================
-   البيع عن طريق رقم أو اسم الصنف
-========================================= */
 
 function sellProductByIndex(index, salePrice = null) {
     if (typeof products === "undefined" || !Array.isArray(products) || index < 0 || index >= products.length) {
@@ -115,10 +121,6 @@ function sellProductByName(name, salePrice = null) {
     return sellProduct(product, salePrice);
 }
 
-/* =========================================
-   تعديل الكميات
-========================================= */
-
 function decreaseProductQuantity(product) {
     if (!product) return false;
     const quantity = Number(product.quantity) || 0;
@@ -140,8 +142,9 @@ function increaseProductQuantity(product, amount = 1) {
     return true;
 }
 
+
 /* =========================================
-   دوال الحسابات والمبيعات للتقارير
+   3. دوال الحسابات للتقارير
 ========================================= */
 
 function getDaySales() {
@@ -152,7 +155,7 @@ function getDaySales() {
 
 function getMonthSales() {
     if (!Array.isArray(window.sales)) return [];
-    const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+    const currentMonth = new Date().toISOString().slice(0, 7);
     return window.sales.filter(s => s.date && s.date.startsWith(currentMonth));
 }
 
@@ -165,7 +168,10 @@ function calculateSalesStats(salesList) {
         salesList.forEach(s => {
             const qty = Number(s.quantity) || 1;
             const sellPrice = Number(s.sell) || 0;
-            const itemProfit = Number(s.profit) || (sellPrice - (Number(s.buy) || 0));
+            const buyPrice = Number(s.buy) || 0;
+            const itemProfit = Number(s.profit) !== undefined && !isNaN(s.profit)
+                ? Number(s.profit)
+                : (sellPrice - buyPrice);
 
             count += qty;
             sales += sellPrice * qty;
@@ -176,8 +182,9 @@ function calculateSalesStats(salesList) {
     return { count, sales, profit };
 }
 
+
 /* =========================================
-   تقرير المبيعات والمخزون
+   4. عرض التقارير والجرد
 ========================================= */
 
 function showReports() {
@@ -190,11 +197,22 @@ function showReports() {
     const day = calculateSalesStats(dayList);
     const month = calculateSalesStats(monthList);
 
-    const todayDate = new Date();
-    const formattedToday = todayDate.toLocaleDateString("ar-EG", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    // حساب إجمالي قيمة المخزون الحالي كاملاً بسعر الجملة/الشراء
+    const totalInventoryCost = getTotalInventoryCost();
 
-    /* تفاصيل مبيعات اليوم */
+    const todayDate = new Date();
+    const formattedToday = todayDate.toLocaleDateString("ar-EG", { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+
+    /* =====================================
+       تفاصيل مبيعات اليوم
+    ===================================== */
     let soldHTML = "";
+
     if (!Array.isArray(dayList) || dayList.length === 0) {
         soldHTML = '<div class="sold-item">لا توجد مبيعات اليوم</div>';
     } else {
@@ -202,7 +220,9 @@ function showReports() {
             const quantity = Number(s.quantity) || 1;
             const buy = Number(s.buy) || 0;
             const sell = Number(s.sell) || 0;
-            const profit = Number(s.profit) || (sell - buy);
+            const profit = Number(s.profit) !== undefined && !isNaN(s.profit) 
+                ? Number(s.profit) 
+                : (sell - buy);
 
             soldHTML += `
             <div class="sold-item">
@@ -217,7 +237,9 @@ function showReports() {
         });
     }
 
-    /* جرد الشهر */
+    /* =====================================
+       جرد الشهر
+    ===================================== */
     const days = {};
     monthList.forEach(s => {
         if (!days[s.date]) days[s.date] = [];
@@ -234,7 +256,6 @@ function showReports() {
             const list = days[date];
             const stats = calculateSalesStats(list);
 
-            // تجميع المبيعات حسب اسم المنتج اليومي
             const productsMap = {};
             list.forEach(s => {
                 const name = s.name || "بدون اسم";
@@ -244,7 +265,9 @@ function showReports() {
                 const qty = Number(s.quantity) || 1;
                 const buy = Number(s.buy) || 0;
                 const sell = Number(s.sell) || 0;
-                const profit = Number(s.profit) || (sell - buy);
+                const profit = Number(s.profit) !== undefined && !isNaN(s.profit) 
+                    ? Number(s.profit) 
+                    : (sell - buy);
 
                 productsMap[name].quantity += qty;
                 productsMap[name].buyTotal += buy * qty;
@@ -275,6 +298,7 @@ function showReports() {
                 <div class="month-day-title">📅 ${escapeHtml(date)}</div>
                 <div class="report-row"><span>عدد القطع المباعة</span><strong>${stats.count}</strong></div>
                 <div class="report-row"><span>إجمالي المبيعات</span><strong class="green">${money(stats.sales)}</strong></div>
+                <div class="report-row"><span>تكلفة البضاعة</span><strong class="red">${money(totalInventoryCost)}</strong></div>
                 <div class="report-row"><span>صافي الربح</span><strong class="blue">${money(stats.profit)}</strong></div>
                 <div class="sold-title">الأصناف المباعة:</div>
                 ${itemsHTML}
@@ -282,22 +306,61 @@ function showReports() {
         });
     }
 
-    /* التقرير النهائي */
+    /* =====================================
+       عرض التقرير النهائي
+    ===================================== */
     reports.innerHTML = `
     <div class="report-box">
         <h2>📅 جرد اليوم</h2>
         <div class="report-date">${formattedToday}</div>
-        <div class="report-row"><span>عدد القطع المباعة</span><strong>${day.count}</strong></div>
-        <div class="report-row"><span>إجمالي المبيعات</span><strong class="green">${money(day.sales)}</strong></div>
-        <div class="report-row"><span>صافي الربح</span><strong class="blue">${money(day.profit)}</strong></div>
+        
+        <div class="report-row">
+            <span>عدد القطع المباعة</span>
+            <strong>${day.count}</strong>
+        </div>
+        
+        <div class="report-row">
+            <span>إجمالي المبيعات</span>
+            <strong class="green">${money(day.sales)}</strong>
+        </div>
+        
+        <div class="report-row">
+            <span>تكلفة البضاعة</span>
+            <strong class="red">${money(totalInventoryCost)}</strong>
+        </div>
+        
+        <div class="report-row">
+            <span>صافي الربح</span>
+            <strong class="blue">${money(day.profit)}</strong>
+        </div>
+        
         <div class="sold-title">الأصناف المباعة بالتفصيل:</div>
         ${soldHTML}
     </div>
+
     <div class="report-box">
         <h2>📆 الجرد الشهري</h2>
-        <div class="report-row"><span>إجمالي القطع المباعة</span><strong>${month.count}</strong></div>
-        <div class="report-row"><span>إجمالي المبيعات</span><strong class="green">${money(month.sales)}</strong></div>
-        <div class="report-row"><span>إجمالي صافي الربح</span><strong class="blue">${money(month.profit)}</strong></div>
+        
+        <div class="report-row">
+            <span>إجمالي القطع المباعة</span>
+            <strong>${month.count}</strong>
+        </div>
+        
+        <div class="report-row">
+            <span>إجمالي المبيعات</span>
+            <strong class="green">${money(month.sales)}</strong>
+        </div>
+        
+        <div class="report-row">
+            <span>تكلفة البضاعة</span>
+            <strong class="red">${money(totalInventoryCost)}</strong>
+        </div>
+        
+        <div class="report-row">
+            <span>إجمالي صافي الربح</span>
+            <strong class="blue">${money(month.profit)}</strong>
+        </div>
+        
         <hr>
         ${monthlyHTML}
     </div>`;
