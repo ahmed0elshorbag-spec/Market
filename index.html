@@ -1,465 +1,620 @@
+/* =========================================
+   قيمة البضاعة الحالية بسعر الجملة
+   الكمية الحالية × سعر الجملة
+========================================= */
+
 function getInventoryValue(){
 
-let value = 0;
+    let value = 0;
 
-products.forEach(p => {
+    if(!Array.isArray(products)){
+        return 0;
+    }
 
-value +=
-(Number(p.quantity) || 0) *
-(Number(p.buy) || 0);
+    products.forEach(p => {
 
-});
+        const quantity =
+            Number(p.quantity) || 0;
 
-return value;
+        const buy =
+            Number(p.buy) || 0;
+
+        value += quantity * buy;
+
+    });
+
+    return value;
 
 }
 
 
-/* تفاصيل البضاعة الموجودة */
+/* =========================================
+   تفاصيل البضاعة الموجودة
+========================================= */
 
 function showInventoryDetails(){
 
-const details =
-document.getElementById("inventoryDetails");
+    const details =
+        document.getElementById("inventoryDetails");
 
-if(!details) return;
+    if(!details) return;
 
-let html = "";
+    let html = "";
 
-products.forEach(p => {
+    if(!Array.isArray(products) || products.length === 0){
 
-const quantity =
-Number(p.quantity) || 0;
+        html =
+            '<div class="sold-item">لا توجد بضاعة</div>';
 
-const buy =
-Number(p.buy) || 0;
+    }else{
 
-const total =
-quantity * buy;
+        products.forEach(p => {
 
-html += `
+            const quantity =
+                Number(p.quantity) || 0;
 
-<div class="report-row">
+            const buy =
+                Number(p.buy) || 0;
 
-<span>
+            const total =
+                quantity * buy;
 
-<strong>
-${escapeHtml(p.name)}
-</strong>
+            html += `
 
-<br>
+            <div class="report-row">
 
-<small>
-الكمية: ${quantity}
- ×
-سعر الجملة: ${money(buy)}
-</small>
+                <span>
 
-</span>
+                    <strong>
+                        ${escapeHtml(p.name || "")}
+                    </strong>
 
-<strong>
-${money(total)}
-</strong>
+                    <br>
 
-</div>
+                    <small>
+                        الكمية: ${quantity}
+                        ×
+                        سعر الجملة: ${money(buy)}
+                    </small>
 
-`;
+                </span>
 
-});
+                <strong>
+                    ${money(total)}
+                </strong>
+
+            </div>
+
+            `;
+
+        });
+
+    }
 
 
-details.innerHTML = `
+    details.innerHTML = `
 
-<div class="report-box">
+        <div class="report-box">
 
-<h2>
-📦 تفاصيل البضاعة الموجودة
-</h2>
+            <h2>
+                📦 تفاصيل البضاعة الموجودة
+            </h2>
 
-${html || '<div class="sold-item">لا توجد بضاعة</div>'}
+            ${html}
 
-<hr>
+            <hr>
 
-<div class="report-row">
+            <div class="report-row">
 
-<span>
-<strong>إجمالي تكلفة البضاعة</strong>
-</span>
+                <span>
+                    <strong>
+                        إجمالي تكلفة البضاعة
+                    </strong>
+                </span>
 
-<strong class="blue">
-${money(getInventoryValue())}
-</strong>
+                <strong class="blue">
+                    ${money(getInventoryValue())}
+                </strong>
 
-</div>
+            </div>
 
-</div>
+        </div>
 
-`;
+    `;
 
 }
 
 
-/* إظهار وإخفاء تفاصيل البضاعة */
+/* =========================================
+   إظهار وإخفاء تفاصيل المخزون
+========================================= */
 
 function toggleInventoryDetails(){
 
-const details =
-document.getElementById("inventoryDetails");
+    const details =
+        document.getElementById("inventoryDetails");
 
-if(!details) return;
+    if(!details) return;
 
-if(details.innerHTML.trim() !== ""){
+    if(details.innerHTML.trim() !== ""){
 
-details.innerHTML = "";
+        details.innerHTML = "";
 
-}else{
+    }else{
 
-showInventoryDetails();
+        showInventoryDetails();
+
+    }
 
 }
 
+
+/* =========================================
+   تحديث قيمة المخزون بعد البيع أو الإضافة
+========================================= */
+
+function refreshInventoryValue(){
+
+    const value =
+        getInventoryValue();
+
+    const elements =
+        document.querySelectorAll(
+            ".inventory-value"
+        );
+
+    elements.forEach(element => {
+
+        element.textContent =
+            money(value);
+
+    });
+
 }
 
+
+/* =========================================
+   تقرير المبيعات والمخزون
+========================================= */
 
 function showReports(){
 
-const reports =
-document.getElementById("reports");
+    const reports =
+        document.getElementById("reports");
 
-const dayList =
-getDaySales();
+    const dayList =
+        getDaySales();
 
-const monthList =
-getMonthSales();
+    const monthList =
+        getMonthSales();
 
-const day =
-calculate(dayList);
+    const day =
+        calculate(dayList);
 
-const month =
-calculate(monthList);
+    const month =
+        calculate(monthList);
 
-const today =
-getDateInfo();
+    const today =
+        getDateInfo();
 
-const inventoryValue =
-getInventoryValue();
+    /*
+       هنا يتم حساب تكلفة البضاعة
+       من الكميات الموجودة حاليًا
+       × سعر الجملة
+    */
 
-const soldProducts =
-getSoldProducts(dayList);
+    const inventoryValue =
+        getInventoryValue();
+
+    const soldProducts =
+        getSoldProducts(dayList);
 
 
-/* تفاصيل مبيعات اليوم */
+    /* =====================================
+       تفاصيل مبيعات اليوم
+    ===================================== */
 
-let soldHTML = "";
+    let soldHTML = "";
 
-if(Object.keys(soldProducts).length === 0){
+    if(Object.keys(soldProducts).length === 0){
 
-soldHTML =
-'<div class="sold-item">لا توجد مبيعات اليوم</div>';
+        soldHTML =
+            '<div class="sold-item">لا توجد مبيعات اليوم</div>';
 
-}else{
+    }else{
 
-Object.keys(soldProducts).forEach(name => {
+        Object.keys(soldProducts).forEach(name => {
 
-soldHTML += `
+            soldHTML += `
 
-<div class="sold-item">
+            <div class="sold-item">
 
-<span>
-${escapeHtml(name)}
-</span>
+                <span>
+                    ${escapeHtml(name)}
+                </span>
 
-<strong>
-${soldProducts[name]}
-</strong>
+                <strong>
+                    ${soldProducts[name]}
+                </strong>
 
-</div>
+            </div>
 
-`;
+            `;
 
-});
+        });
+
+    }
+
+
+    /* =====================================
+       جرد الشهر مقسم يوم بيوم
+    ===================================== */
+
+    const days = {};
+
+    monthList.forEach(s => {
+
+        if(!days[s.date]){
+            days[s.date] = [];
+        }
+
+        days[s.date].push(s);
+
+    });
+
+
+    let monthlyHTML = "";
+
+    const sortedDates =
+        Object.keys(days).sort();
+
+
+    if(sortedDates.length === 0){
+
+        monthlyHTML =
+            '<div class="sold-item">لا توجد مبيعات هذا الشهر</div>';
+
+    }else{
+
+        sortedDates.forEach(date => {
+
+            const list =
+                days[date];
+
+            const stats =
+                calculate(list);
+
+            const sold =
+                getSoldProducts(list);
+
+            let itemsHTML = "";
+
+
+            Object.keys(sold).forEach(name => {
+
+                itemsHTML += `
+
+                <div class="sold-item">
+
+                    <span>
+                        ${escapeHtml(name)}
+                    </span>
+
+                    <strong>
+                        ${sold[name]}
+                    </strong>
+
+                </div>
+
+                `;
+
+            });
+
+
+            monthlyHTML += `
+
+            <div class="month-day">
+
+                <div class="month-day-title">
+                    📅 ${dateTitle(date)}
+                </div>
+
+
+                <div class="report-row">
+
+                    <span>
+                        عدد القطع المباعة
+                    </span>
+
+                    <strong>
+                        ${stats.count}
+                    </strong>
+
+                </div>
+
+
+                <div class="report-row">
+
+                    <span>
+                        إجمالي المبيعات
+                    </span>
+
+                    <strong class="green">
+                        ${money(stats.sales)}
+                    </strong>
+
+                </div>
+
+
+                <div class="report-row">
+
+                    <span>
+                        قيمة البضاعة الموجودة بسعر الجملة
+                    </span>
+
+                    <strong
+                        class="inventory-value"
+                        onclick="toggleInventoryDetails()"
+                        style="
+                            cursor:pointer;
+                            text-decoration:underline;
+                        "
+                    >
+                        ${money(inventoryValue)}
+                    </strong>
+
+                </div>
+
+
+                <div class="report-row">
+
+                    <span>
+                        صافي الربح
+                    </span>
+
+                    <strong class="blue">
+                        ${money(stats.profit)}
+                    </strong>
+
+                </div>
+
+
+                <div class="sold-title">
+                    الأصناف المباعة:
+                </div>
+
+                ${itemsHTML}
+
+            </div>
+
+            `;
+
+        });
+
+    }
+
+
+    /* =====================================
+       التقرير النهائي
+    ===================================== */
+
+    reports.innerHTML = `
+
+    <div class="report-box">
+
+        <h2>
+            📅 جرد اليوم
+        </h2>
+
+
+        <div class="report-date">
+            ${today.dayName}
+            —
+            ${today.formatted}
+        </div>
+
+
+        <div class="report-row">
+
+            <span>
+                عدد القطع المباعة
+            </span>
+
+            <strong>
+                ${day.count}
+            </strong>
+
+        </div>
+
+
+        <div class="report-row">
+
+            <span>
+                إجمالي المبيعات بسعر البيع
+            </span>
+
+            <strong class="green">
+                ${money(day.sales)}
+            </strong>
+
+        </div>
+
+
+        <div class="report-row">
+
+            <span>
+                قيمة البضاعة الموجودة بسعر الجملة
+            </span>
+
+            <strong
+                class="inventory-value"
+                onclick="toggleInventoryDetails()"
+                style="
+                    cursor:pointer;
+                    text-decoration:underline;
+                "
+            >
+                ${money(inventoryValue)}
+            </strong>
+
+        </div>
+
+
+        <div class="report-row">
+
+            <span>
+                صافي الربح
+            </span>
+
+            <strong class="blue">
+                ${money(day.profit)}
+            </strong>
+
+        </div>
+
+
+        <div class="sold-title">
+            الأصناف المباعة وعدد القطع:
+        </div>
+
+        ${soldHTML}
+
+    </div>
+
+
+    <div class="report-box">
+
+        <h2>
+            📆 الجرد الشهري
+        </h2>
+
+
+        <div class="report-row">
+
+            <span>
+                إجمالي القطع المباعة
+            </span>
+
+            <strong>
+                ${month.count}
+            </strong>
+
+        </div>
+
+
+        <div class="report-row">
+
+            <span>
+                إجمالي المبيعات بسعر البيع
+            </span>
+
+            <strong class="green">
+                ${money(month.sales)}
+            </strong>
+
+        </div>
+
+
+        <div class="report-row">
+
+            <span>
+                قيمة البضاعة الموجودة حاليًا بسعر الجملة
+            </span>
+
+            <strong
+                class="inventory-value"
+                onclick="toggleInventoryDetails()"
+                style="
+                    cursor:pointer;
+                    text-decoration:underline;
+                "
+            >
+                ${money(inventoryValue)}
+            </strong>
+
+        </div>
+
+
+        <div class="report-row">
+
+            <span>
+                إجمالي صافي الربح
+            </span>
+
+            <strong class="blue">
+                ${money(month.profit)}
+            </strong>
+
+        </div>
+
+
+        <hr>
+
+        ${monthlyHTML}
+
+    </div>
+
+
+    <div id="inventoryDetails"></div>
+
+    `;
 
 }
 
 
-/* جرد الشهر مقسم يوم بيوم */
+/* =========================================
+   خصم قطعة من المخزون
+   =========================================
+   
+   هذه الدالة مستقلة.
+   عند بيع قطعة:
+   الكمية تقل 1
+   وبالتالي getInventoryValue()
+   تنخفض بسعر الجملة تلقائيًا.
+========================================= */
 
-const days = {};
+function decreaseProductQuantity(product){
 
-monthList.forEach(s => {
+    if(!product) return false;
 
-if(!days[s.date]){
-days[s.date] = [];
-}
+    const quantity =
+        Number(product.quantity) || 0;
 
-days[s.date].push(s);
+    if(quantity <= 0){
+        return false;
+    }
 
-});
+    product.quantity =
+        quantity - 1;
 
+    refreshInventoryValue();
 
-let monthlyHTML = "";
-
-const sortedDates =
-Object.keys(days).sort();
-
-if(sortedDates.length === 0){
-
-monthlyHTML =
-'<div class="sold-item">لا توجد مبيعات هذا الشهر</div>';
-
-}else{
-
-sortedDates.forEach(date => {
-
-const list =
-days[date];
-
-const stats =
-calculate(list);
-
-const sold =
-getSoldProducts(list);
-
-let itemsHTML = "";
-
-Object.keys(sold).forEach(name => {
-
-itemsHTML += `
-
-<div class="sold-item">
-
-<span>
-${escapeHtml(name)}
-</span>
-
-<strong>
-${sold[name]}
-</strong>
-
-</div>
-
-`;
-
-});
-
-
-monthlyHTML += `
-
-<div class="month-day">
-
-<div class="month-day-title">
-📅 ${dateTitle(date)}
-</div>
-
-<div class="report-row">
-
-<span>
-عدد القطع المباعة
-</span>
-
-<strong>
-${stats.count}
-</strong>
-
-</div>
-
-<div class="report-row">
-
-<span>
-إجمالي المبيعات
-</span>
-
-<strong class="green">
-${money(stats.sales)}
-</strong>
-
-</div>
-
-<div class="report-row">
-
-<span>
-قيمة البضاعة الموجودة بسعر الجملة
-</span>
-
-<strong
-onclick="toggleInventoryDetails()"
-style="cursor:pointer;text-decoration:underline;">
-
-${money(inventoryValue)}
-
-</strong>
-
-</div>
-
-<div class="report-row">
-
-<span>
-صافي الربح
-</span>
-
-<strong class="blue">
-${money(stats.profit)}
-</strong>
-
-</div>
-
-<div class="sold-title">
-الأصناف المباعة:
-</div>
-
-${itemsHTML}
-
-</div>
-
-`;
-
-});
+    return true;
 
 }
 
 
-reports.innerHTML = `
+/* =========================================
+   إضافة كمية للمخزون
+   ========================================= */
 
-<div class="report-box">
+function increaseProductQuantity(product, amount = 1){
 
-<h2>
-📅 جرد اليوم
-</h2>
+    if(!product) return false;
 
-<div class="report-date">
-${today.dayName}
-—
-${today.formatted}
-</div>
+    const add =
+        Number(amount) || 0;
 
-<div class="report-row">
+    if(add <= 0) return false;
 
-<span>
-عدد القطع المباعة
-</span>
+    const quantity =
+        Number(product.quantity) || 0;
 
-<strong>
-${day.count}
-</strong>
+    product.quantity =
+        quantity + add;
 
-</div>
+    refreshInventoryValue();
 
-<div class="report-row">
-
-<span>
-إجمالي المبيعات بسعر البيع
-</span>
-
-<strong class="green">
-${money(day.sales)}
-</strong>
-
-</div>
-
-<div class="report-row">
-
-<span>
-قيمة البضاعة الموجودة بسعر الجملة
-</span>
-
-<strong
-onclick="toggleInventoryDetails()"
-style="cursor:pointer;text-decoration:underline;">
-
-${money(inventoryValue)}
-
-</strong>
-
-</div>
-
-<div class="report-row">
-
-<span>
-صافي الربح
-</span>
-
-<strong class="blue">
-${money(day.profit)}
-</strong>
-
-</div>
-
-<div class="sold-title">
-الأصناف المباعة وعدد القطع:
-</div>
-
-${soldHTML}
-
-</div>
-
-
-<div class="report-box">
-
-<h2>
-📆 الجرد الشهري
-</h2>
-
-<div class="report-row">
-
-<span>
-إجمالي القطع المباعة
-</span>
-
-<strong>
-${month.count}
-</strong>
-
-</div>
-
-<div class="report-row">
-
-<span>
-إجمالي المبيعات بسعر البيع
-</span>
-
-<strong class="green">
-${money(month.sales)}
-</strong>
-
-</div>
-
-<div class="report-row">
-
-<span>
-قيمة البضاعة الموجودة حاليًا بسعر الجملة
-</span>
-
-<strong
-onclick="toggleInventoryDetails()"
-style="cursor:pointer;text-decoration:underline;">
-
-${money(inventoryValue)}
-
-</strong>
-
-</div>
-
-<div class="report-row">
-
-<span>
-إجمالي صافي الربح
-</span>
-
-<strong class="blue">
-${money(month.profit)}
-</strong>
-
-</div>
-
-<hr>
-
-${monthlyHTML}
-
-</div>
-
-
-<div id="inventoryDetails"></div>
-
-`;
+    return true;
 
 }
