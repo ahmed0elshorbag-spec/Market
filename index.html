@@ -1,11 +1,11 @@
 /* =========================================
-   قيمة البضاعة الحالية بسعر الجملة
+   إجمالي سعر البضاعة الحالية
    الكمية الحالية × سعر الجملة
 ========================================= */
 
-function getInventoryValue(){
+function getTotalGoodsValue(){
 
-    let value = 0;
+    let total = 0;
 
     if(!Array.isArray(products)){
         return 0;
@@ -19,11 +19,22 @@ function getInventoryValue(){
         const buy =
             Number(p.buy) || 0;
 
-        value += quantity * buy;
+        total += quantity * buy;
 
     });
 
-    return value;
+    return total;
+}
+
+
+/* =========================================
+   توافق مع الكود القديم
+========================================= */
+
+function getInventoryValue(){
+
+    return getTotalGoodsValue();
+
 }
 
 
@@ -110,8 +121,8 @@ function showInventoryDetails(){
                     </strong>
                 </span>
 
-                <strong class="blue">
-                    ${money(getInventoryValue())}
+                <strong class="blue total-goods-value">
+                    ${money(getTotalGoodsValue())}
                 </strong>
 
             </div>
@@ -147,25 +158,37 @@ function toggleInventoryDetails(){
 
 
 /* =========================================
-   تحديث قيم البضاعة
+   تحديث قيمة البضاعة بالكامل
 ========================================= */
 
 function refreshInventoryValue(){
 
-    const value =
-        getInventoryValue();
+    const total =
+        getTotalGoodsValue();
 
-    const elements =
-        document.querySelectorAll(
-            ".inventory-value"
-        );
 
-    elements.forEach(element => {
+    /* قيمة البضاعة الحالية */
 
-        element.textContent =
-            money(value);
+    document
+        .querySelectorAll(".inventory-value")
+        .forEach(element => {
 
-    });
+            element.textContent =
+                money(total);
+
+        });
+
+
+    /* إجمالي سعر البضاعة */
+
+    document
+        .querySelectorAll(".total-goods-value")
+        .forEach(element => {
+
+            element.textContent =
+                money(total);
+
+        });
 
 }
 
@@ -181,6 +204,7 @@ function sellProduct(product, salePrice = 0){
         return false;
 
     }
+
 
     const quantity =
         Number(product.quantity) || 0;
@@ -210,9 +234,7 @@ function sellProduct(product, salePrice = 0){
         quantity - 1;
 
 
-    /* =====================================
-       تسجيل عملية البيع
-    ===================================== */
+    /* تسجيل البيع */
 
     if(!Array.isArray(window.sales)){
 
@@ -244,9 +266,7 @@ function sellProduct(product, salePrice = 0){
     });
 
 
-    /* =====================================
-       حفظ المخزون
-    ===================================== */
+    /* حفظ المخزون */
 
     try{
 
@@ -273,9 +293,7 @@ function sellProduct(product, salePrice = 0){
     }
 
 
-    /* =====================================
-       تحديث قيمة البضاعة
-    ===================================== */
+    /* تحديث إجمالي البضاعة */
 
     refreshInventoryValue();
 
@@ -383,6 +401,7 @@ function decreaseProductQuantity(product){
 
     }
 
+
     const quantity =
         Number(product.quantity) || 0;
 
@@ -468,6 +487,8 @@ function increaseProductQuantity(
         quantity + add;
 
 
+    /* حفظ التغيير */
+
     try{
 
         if(typeof saveProducts === "function"){
@@ -532,11 +553,11 @@ function showReports(){
 
 
     /* =====================================
-       قيمة البضاعة الحالية
+       إجمالي سعر البضاعة الحالي
     ===================================== */
 
-    const inventoryValue =
-        getInventoryValue();
+    const totalGoodsValue =
+        getTotalGoodsValue();
 
 
     const soldProducts =
@@ -705,7 +726,7 @@ function showReports(){
                             text-decoration:underline;
                         "
                     >
-                        ${money(inventoryValue)}
+                        ${money(totalGoodsValue)}
                     </strong>
 
                 </div>
@@ -717,8 +738,8 @@ function showReports(){
                         إجمالي سعر البضاعة
                     </span>
 
-                    <strong class="blue">
-                        ${money(inventoryValue)}
+                    <strong class="blue total-goods-value">
+                        ${money(totalGoodsValue)}
                     </strong>
 
                 </div>
@@ -812,7 +833,7 @@ function showReports(){
                     text-decoration:underline;
                 "
             >
-                ${money(inventoryValue)}
+                ${money(totalGoodsValue)}
             </strong>
 
         </div>
@@ -824,8 +845,8 @@ function showReports(){
                 إجمالي سعر البضاعة
             </span>
 
-            <strong class="blue">
-                ${money(inventoryValue)}
+            <strong class="blue total-goods-value">
+                ${money(totalGoodsValue)}
             </strong>
 
         </div>
@@ -901,7 +922,7 @@ function showReports(){
                     text-decoration:underline;
                 "
             >
-                ${money(inventoryValue)}
+                ${money(totalGoodsValue)}
             </strong>
 
         </div>
@@ -913,8 +934,8 @@ function showReports(){
                 إجمالي سعر البضاعة
             </span>
 
-            <strong class="blue">
-                ${money(inventoryValue)}
+            <strong class="blue total-goods-value">
+                ${money(totalGoodsValue)}
             </strong>
 
         </div>
