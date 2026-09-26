@@ -34,19 +34,6 @@ function saveProductsData() {
     }
 }
 
-// حساب إجمالي سعر شراء المخزون بالكامل بسعر الجملة
-function getTotalInventoryCost() {
-    if (typeof products === "undefined" || !Array.isArray(products)) {
-        return 0;
-    }
-
-    return products.reduce((total, product) => {
-        const quantity = Number(product.quantity) || 0;
-        const buyPrice = Number(product.buy) || 0;
-        return total + (quantity > 0 ? quantity * buyPrice : 0);
-    }, 0);
-}
-
 /* =========================================
    2. إدارة المبيعات والمخزون
 ========================================= */
@@ -177,7 +164,7 @@ function calculateSalesStats(salesList) {
 }
 
 /* =========================================
-   4. عرض التقارير والجرد
+   4. عرض التقارير والجرد (بدون تكلفة البضاعة)
 ========================================= */
 
 function showReports() {
@@ -189,8 +176,6 @@ function showReports() {
 
     const day = calculateSalesStats(dayList);
     const month = calculateSalesStats(monthList);
-
-    const totalInventoryCost = getTotalInventoryCost();
 
     const todayDate = new Date();
     const formattedToday = todayDate.toLocaleDateString("ar-EG", { 
@@ -284,7 +269,6 @@ function showReports() {
                 <div class="month-day-title">📅 ${escapeHtml(date)}</div>
                 <div class="report-row"><span>عدد القطع المباعة</span><strong>${stats.count}</strong></div>
                 <div class="report-row"><span>إجمالي المبيعات</span><strong class="green">${money(stats.sales)}</strong></div>
-                <div class="report-row"><span>تكلفة البضاعة</span><strong class="red">${money(totalInventoryCost)}</strong></div>
                 <div class="report-row"><span>صافي الربح</span><strong class="blue">${money(stats.profit)}</strong></div>
                 <div class="sold-title">الأصناف المباعة:</div>
                 ${itemsHTML}
@@ -305,11 +289,6 @@ function showReports() {
         <div class="report-row">
             <span>إجمالي المبيعات</span>
             <strong class="green">${money(day.sales)}</strong>
-        </div>
-        
-        <div class="report-row">
-            <span>تكلفة البضاعة</span>
-            <strong class="red">${money(totalInventoryCost)}</strong>
         </div>
         
         <div class="report-row">
@@ -335,11 +314,6 @@ function showReports() {
         </div>
         
         <div class="report-row">
-            <span>تكلفة البضاعة</span>
-            <strong class="red">${money(totalInventoryCost)}</strong>
-        </div>
-        
-        <div class="report-row">
             <span>إجمالي صافي الربح</span>
             <strong class="blue">${money(month.profit)}</strong>
         </div>
@@ -349,7 +323,7 @@ function showReports() {
     </div>`;
 }
 
-// تشغيل التقارير أول ما الصفحة تحمل تلقائياً
+// تشغيل التقارير تلقائياً عند فتح الصفحة
 document.addEventListener("DOMContentLoaded", function() {
     showReports();
 });
