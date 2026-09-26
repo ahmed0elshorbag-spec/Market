@@ -1,8 +1,8 @@
+<script>
 /* =========================================
    1. دوال مساعدة لتأمين وتنسيق البيانات
 ========================================= */
 
-// تنظيف النصوص للحماية من ثغرات XSS
 function escapeHtml(str) {
     if (!str) return "";
     return String(str)
@@ -13,18 +13,15 @@ function escapeHtml(str) {
         .replace(/'/g, "&#039;");
 }
 
-// تنسيق المبالغ المالية
 function money(amount) {
     const num = Number(amount) || 0;
     return num.toFixed(2) + " ج";
 }
 
-// استخراج التاريخ بصيغة YYYY-MM-DD
 function getFormattedDate(dateObj = new Date()) {
     return dateObj.toISOString().split("T")[0];
 }
 
-// حفظ بيانات المخزون بالأمان
 function saveProductsData() {
     try {
         if (typeof saveProducts === "function") {
@@ -37,7 +34,7 @@ function saveProductsData() {
     }
 }
 
-// حساب إجمالي سعر شراء المخزون كامل لكل الأصناف بسعر الجملة
+// حساب إجمالي سعر شراء المخزون بالكامل بسعر الجملة
 function getTotalInventoryCost() {
     if (typeof products === "undefined" || !Array.isArray(products)) {
         return 0;
@@ -49,7 +46,6 @@ function getTotalInventoryCost() {
         return total + (quantity > 0 ? quantity * buyPrice : 0);
     }, 0);
 }
-
 
 /* =========================================
    2. إدارة المبيعات والمخزون
@@ -73,10 +69,8 @@ function sellProduct(product, salePrice = null) {
         return false;
     }
 
-    /* خصم قطعة واحدة */
     product.quantity = quantity - 1;
 
-    /* تسجيل البيع */
     if (!Array.isArray(window.sales)) {
         window.sales = [];
     }
@@ -93,9 +87,8 @@ function sellProduct(product, salePrice = null) {
         timestamp: now.toISOString()
     });
 
-    /* حفظ المخزون */
     saveProductsData();
-
+    showReports(); // تحديث التقارير فوراً بعد كل بيعة
     return true;
 }
 
@@ -128,6 +121,7 @@ function decreaseProductQuantity(product) {
 
     product.quantity = quantity - 1;
     saveProductsData();
+    showReports();
     return true;
 }
 
@@ -139,9 +133,9 @@ function increaseProductQuantity(product, amount = 1) {
     const quantity = Number(product.quantity) || 0;
     product.quantity = quantity + add;
     saveProductsData();
+    showReports();
     return true;
 }
-
 
 /* =========================================
    3. دوال الحسابات للتقارير
@@ -182,7 +176,6 @@ function calculateSalesStats(salesList) {
     return { count, sales, profit };
 }
 
-
 /* =========================================
    4. عرض التقارير والجرد
 ========================================= */
@@ -197,7 +190,6 @@ function showReports() {
     const day = calculateSalesStats(dayList);
     const month = calculateSalesStats(monthList);
 
-    // حساب إجمالي قيمة المخزون الحالي كاملاً بسعر الجملة/الشراء
     const totalInventoryCost = getTotalInventoryCost();
 
     const todayDate = new Date();
@@ -208,9 +200,6 @@ function showReports() {
         day: 'numeric' 
     });
 
-    /* =====================================
-       تفاصيل مبيعات اليوم
-    ===================================== */
     let soldHTML = "";
 
     if (!Array.isArray(dayList) || dayList.length === 0) {
@@ -237,9 +226,6 @@ function showReports() {
         });
     }
 
-    /* =====================================
-       جرد الشهر
-    ===================================== */
     const days = {};
     monthList.forEach(s => {
         if (!days[s.date]) days[s.date] = [];
@@ -306,9 +292,6 @@ function showReports() {
         });
     }
 
-    /* =====================================
-       عرض التقرير النهائي
-    ===================================== */
     reports.innerHTML = `
     <div class="report-box">
         <h2>📅 جرد اليوم</h2>
@@ -365,3 +348,11 @@ function showReports() {
         ${monthlyHTML}
     </div>`;
 }
+
+// تشغيل التقارير أول ما الصفحة تحمل تلقائياً
+document.addEventListener("DOMContentLoaded", function() {
+    showReports();
+});
+</script>
+</body>
+</html>
