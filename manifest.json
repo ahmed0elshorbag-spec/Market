@@ -1,9 +1,10 @@
 {
-  "name": "Market",
-  "short_name": "Market",
-  "start_url": "/Market/",
+  "name": "ميني ماركت الشوربجي",
+  "short_name": "الماركت",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
-  "icons": []
+  "background_color": "#f3f6f9",
+  "theme_color": "#0d6efd",
+  "description": "إدارة مخزون ومبيعات ميني ماركت الشوربجي"
 }
