@@ -1,952 +1,16 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0d6efd">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<link rel="manifest" href="manifest.json">
-<title>ميني ماركت الشوربجي</title>
+function getInventoryValue(){
 
-<style>
-*{
-  box-sizing:border-box;
-  font-family:Arial,Tahoma,sans-serif;
-}
-
-body{
-  margin:0;
-  background:#f3f6f9;
-  color:#222;
-}
-
-header{
-  background:linear-gradient(135deg,#0d6efd,#084298);
-  color:white;
-  padding:16px 10px;
-  text-align:center;
-  box-shadow:0 3px 10px #0002;
-}
-
-header h1{
-  margin:0;
-  font-size:23px;
-}
-
-header p{
-  margin:6px 0 0;
-  font-size:13px;
-}
-
-.container{
-  width:96%;
-  max-width:900px;
-  margin:12px auto;
-}
-
-.search{
-  width:100%;
-  padding:12px;
-  border:1px solid #ddd;
-  border-radius:10px;
-  font-size:16px;
-  margin-bottom:8px;
-  outline:none;
-}
-
-.top-buttons{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:7px;
-  margin-bottom:10px;
-}
-
-button{
-  border:none;
-  border-radius:9px;
-  padding:9px 7px;
-  font-size:14px;
-  cursor:pointer;
-  color:white;
-  min-height:40px;
-}
-
-.add{
-  background:#198754;
-}
-
-.report{
-  background:#212529;
-}
-
-.summary{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:6px;
-  margin-bottom:10px;
-}
-
-.box{
-  background:white;
-  padding:9px 4px;
-  border-radius:9px;
-  text-align:center;
-  box-shadow:0 1px 5px #0001;
-  font-size:12px;
-}
-
-.box strong{
-  display:block;
-  font-size:16px;
-  color:#0d6efd;
-  margin-top:3px;
-}
-
-.product{
-  background:white;
-  border-radius:10px;
-  padding:8px;
-  margin-bottom:5px;
-  box-shadow:0 1px 5px #0001;
-  display:flex;
-  align-items:center;
-  gap:7px;
-  min-height:67px;
-}
-
-.product-info{
-  flex:1;
-  min-width:0;
-}
-
-.product h3{
-  margin:0 0 3px;
-  font-size:16px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.prices{
-  font-size:11px;
-  color:#555;
-  line-height:1.5;
-}
-
-.price-buy{
-  color:#6c757d;
-}
-
-.price-sell{
-  color:#198754;
-  font-weight:bold;
-}
-
-.price-profit{
-  color:#0d6efd;
-  font-weight:bold;
-}
-
-.stock{
-  margin-top:2px;
-  font-size:12px;
-  color:#555;
-}
-
-.stock strong{
-  color:#0d6efd;
-  font-size:14px;
-}
-
-.product-actions{
-  width:126px;
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:3px;
-  flex-shrink:0;
-}
-
-.action{
-  min-height:34px;
-  padding:3px;
-  font-size:18px;
-  border-radius:7px;
-}
-
-.sell{
-  background:#0d6efd;
-}
-
-.plus{
-  background:#198754;
-}
-
-.minus{
-  background:#dc3545;
-}
-
-.edit{
-  background:#f59f00;
-}
-
-.edit-buy{
-  background:#6f42c1;
-}
-
-.empty{
-  text-align:center;
-  background:white;
-  padding:25px;
-  border-radius:10px;
-  color:#777;
-}
-
-.report-box{
-  background:white;
-  border-radius:10px;
-  padding:12px;
-  margin-bottom:8px;
-  box-shadow:0 1px 5px #0001;
-}
-
-.report-box h2{
-  margin:0 0 7px;
-  color:#0d6efd;
-  font-size:17px;
-}
-
-.report-row{
-  display:flex;
-  justify-content:space-between;
-  border-bottom:1px solid #eee;
-  padding:7px 0;
-  font-size:14px;
-}
-
-.report-row:last-child{
-  border-bottom:0;
-}
-
-.green{
-  color:#198754;
-  font-weight:bold;
-}
-
-.blue{
-  color:#0d6efd;
-  font-weight:bold;
-}
-
-.red{
-  color:#dc3545;
-  font-weight:bold;
-}
-
-.reset{
-  background:#6c757d;
-  width:100%;
-  margin-top:8px;
-  margin-bottom:15px;
-}
-
-@media(max-width:600px){
-
-  .summary{
-    grid-template-columns:repeat(3,1fr);
-  }
-
-  .product{
-    padding:7px 5px;
-  }
-
-  .product-actions{
-    width:115px;
-  }
-
-  .action{
-    font-size:17px;
-  }
-
-  .product h3{
-    font-size:15px;
-  }
-
-  .prices{
-    font-size:10px;
-  }
-}
-</style>
-</head>
-
-<body>
-
-<header>
-<h1>🛒 ميني ماركت الشوربجي</h1>
-<p>إدارة المخزون والمبيعات والأرباح</p>
-</header>
-
-<div class="container">
-
-<input
-id="search"
-class="search"
-type="text"
-placeholder="🔎 ابحث عن الصنف..."
-oninput="displayProducts()"
->
-
-<div class="top-buttons">
-
-<button class="add" onclick="addProduct()">
-➕ إضافة صنف
-</button>
-
-<button class="report" onclick="showReports()">
-📊 الجرد
-</button>
-
-</div>
-
-<div class="summary">
-
-<div class="box">
-الأصناف
-<strong id="totalProducts">0</strong>
-</div>
-
-<div class="box">
-الكمية
-<strong id="totalQuantity">0</strong>
-</div>
-
-<div class="box">
-بيع اليوم
-<strong id="todaySales">0 ج</strong>
-</div>
-
-<div class="box">
-ربح اليوم
-<strong id="todayProfit">0 ج</strong>
-</div>
-
-<div class="box">
-بيع الشهر
-<strong id="monthSales">0 ج</strong>
-</div>
-
-<div class="box">
-ربح الشهر
-<strong id="monthProfit">0 ج</strong>
-</div>
-
-</div>
-
-<div id="reports"></div>
-
-<div id="products"></div>
-
-<button class="reset" onclick="resetData()">
-🔄 إعادة ضبط الكميات
-</button>
-
-</div>
-
-<script>
-
-const defaultProducts = [
-{name:"ميه صغيرة سيوه",buy:0,sell:5,quantity:20},
-{name:"ميه كبيرة",buy:0,sell:8.30,quantity:20},
-{name:"بسكوت بـ5",buy:4,sell:5,quantity:20},
-{name:"بسكوت بـ10",buy:8,sell:10,quantity:20},
-{name:"كوفي ميكس",buy:0,sell:0,quantity:20},
-{name:"إندومي صغير",buy:4.38,sell:0,quantity:48},
-{name:"شيبسي بـ10",buy:0,sell:10,quantity:20},
-{name:"كنز 285 مللي",buy:0,sell:10,quantity:20},
-{name:"عصير مانجا",buy:0,sell:0,quantity:27},
-{name:"عصير برتقال",buy:0,sell:0,quantity:27},
-{name:"عصير ميكس فراولة",buy:0,sell:0,quantity:27}
-];
-
-let products =
-JSON.parse(localStorage.getItem("marketProducts")) ||
-JSON.parse(JSON.stringify(defaultProducts));
-
-let salesHistory =
-JSON.parse(localStorage.getItem("marketSalesHistory")) || [];
-
-
-/* تنظيف البيانات القديمة */
-
-products = products.map(p => ({
-name:String(p.name || ""),
-buy:Number(p.buy ?? 0),
-sell:Number(p.sell ?? p.price ?? 0),
-quantity:Number(p.quantity ?? 0)
-}));
-
-salesHistory = salesHistory.map(s => ({
-date:s.date || "",
-month:s.month || "",
-name:String(s.name || ""),
-sell:Number(s.sell || 0),
-buy:Number(s.buy || 0),
-profit:Number(s.profit ?? ((Number(s.sell)||0)-(Number(s.buy)||0)))
-}));
-
-
-function saveData(){
-
-localStorage.setItem(
-"marketProducts",
-JSON.stringify(products)
-);
-
-localStorage.setItem(
-"marketSalesHistory",
-JSON.stringify(salesHistory)
-);
-
-}
-
-
-function getDateInfo(){
-
-const d=new Date();
-
-const year=d.getFullYear();
-
-const month=String(d.getMonth()+1).padStart(2,"0");
-
-const day=String(d.getDate()).padStart(2,"0");
-
-return {
-date:year+"-"+month+"-"+day,
-month:year+"-"+month
-};
-
-}
-
-
-function money(value){
-
-return Number(value || 0).toFixed(2)+" ج";
-
-}
-
-
-function displayProducts(){
-
-const container=document.getElementById("products");
-
-const search=
-document.getElementById("search").value
-.trim()
-.toLowerCase();
-
-container.innerHTML="";
-
-const filtered=products.filter(product =>
-product.name.toLowerCase().includes(search)
-);
-
-if(filtered.length===0){
-
-container.innerHTML=
-'<div class="empty">لا يوجد صنف بهذا الاسم</div>';
-
-updateSummary();
-
-return;
-
-}
-
-
-filtered.forEach(product=>{
-
-const index=products.indexOf(product);
-
-const profit=
-Number(product.sell)-Number(product.buy);
-
-const div=document.createElement("div");
-
-div.className="product";
-
-div.innerHTML=`
-
-<div class="product-info">
-
-<h3>${escapeHtml(product.name)}</h3>
-
-<div class="prices">
-
-<span class="price-buy">
-شراء: ${product.buy>0 ? money(product.buy) : "—"}
-</span>
-
-&nbsp; | &nbsp;
-
-<span class="price-sell">
-بيع: ${product.sell>0 ? money(product.sell) : "—"}
-</span>
-
-&nbsp; | &nbsp;
-
-<span class="price-profit">
-ربح: ${profit>0 ? money(profit) : "0.00 ج"}
-</span>
-
-</div>
-
-<div class="stock">
-المخزون:
-<strong>${product.quantity}</strong>
-</div>
-
-</div>
-
-<div class="product-actions">
-
-<button
-class="action edit"
-title="تعديل سعر البيع"
-onclick="editSell(${index})">
-✏️
-</button>
-
-<button
-class="action edit-buy"
-title="تعديل سعر الشراء"
-onclick="editBuy(${index})">
-💰
-</button>
-
-<button
-class="action sell"
-title="بيع"
-onclick="sell(${index})">
-🛒
-</button>
-
-<button
-class="action minus"
-title="نقص قطعة"
-onclick="decrease(${index})">
-−
-</button>
-
-<button
-class="action plus"
-title="زود قطعة"
-onclick="increase(${index})">
-+
-</button>
-
-<button
-class="action edit"
-title="تعديل الصنف"
-onclick="editProduct(${index})">
-⚙️
-</button>
-
-</div>
-
-`;
-
-container.appendChild(div);
-
-});
-
-updateSummary();
-
-}
-
-
-function escapeHtml(text){
-
-return String(text)
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;")
-.replace(/'/g,"&#039;");
-
-}
-
-
-function editBuy(index){
-
-const old=
-products[index].buy>0
-?products[index].buy
-:"";
-
-const value=prompt(
-"سعر الشراء لـ "+products[index].name,
-old
-);
-
-if(value===null)return;
-
-const price=Number(
-value.replace(",",".")
-);
-
-if(
-value.trim()==="" ||
-!Number.isFinite(price) ||
-price<0
-){
-
-alert("اكتب سعر صحيح.");
-
-return;
-
-}
-
-products[index].buy=price;
-
-saveData();
-
-displayProducts();
-
-}
-
-
-function editSell(index){
-
-const old=
-products[index].sell>0
-?products[index].sell
-:"";
-
-const value=prompt(
-"سعر البيع لـ "+products[index].name,
-old
-);
-
-if(value===null)return;
-
-const price=Number(
-value.replace(",",".")
-);
-
-if(
-value.trim()==="" ||
-!Number.isFinite(price) ||
-price<0
-){
-
-alert("اكتب سعر صحيح.");
-
-return;
-
-}
-
-products[index].sell=price;
-
-saveData();
-
-displayProducts();
-
-}
-
-
-function editProduct(index){
-
-const p=products[index];
-
-const name=prompt(
-"اسم الصنف:",
-p.name
-);
-
-if(name===null || !name.trim())return;
-
-p.name=name.trim();
-
-editPricesAndQuantity(index);
-
-}
-
-
-function editPricesAndQuantity(index){
-
-const p=products[index];
-
-const buy=prompt(
-"سعر الشراء:",
-p.buy
-);
-
-if(buy===null)return;
-
-const sell=prompt(
-"سعر البيع:",
-p.sell
-);
-
-if(sell===null)return;
-
-const quantity=prompt(
-"الكمية:",
-p.quantity
-);
-
-if(quantity===null)return;
-
-const b=Number(buy.replace(",","."));
-const s=Number(sell.replace(",","."));
-const q=Number(quantity);
-
-if(
-!Number.isFinite(b) || b<0 ||
-!Number.isFinite(s) || s<0 ||
-!Number.isInteger(q) || q<0
-){
-
-alert("البيانات غير صحيحة.");
-
-return;
-
-}
-
-p.buy=b;
-p.sell=s;
-p.quantity=q;
-
-saveData();
-
-displayProducts();
-
-}
-
-
-function addProduct(){
-
-const name=prompt("اسم الصنف الجديد:");
-
-if(!name || !name.trim())return;
-
-const buyValue=prompt("سعر الشراء:");
-
-if(buyValue===null)return;
-
-const sellValue=prompt("سعر البيع:");
-
-if(sellValue===null)return;
-
-const quantityValue=prompt("الكمية الحالية:");
-
-if(quantityValue===null)return;
-
-const buy=Number(
-buyValue.replace(",",".")
-);
-
-const sell=Number(
-sellValue.replace(",",".")
-);
-
-const quantity=Number(quantityValue);
-
-if(
-!Number.isFinite(buy) || buy<0 ||
-!Number.isFinite(sell) || sell<0 ||
-!Number.isInteger(quantity) || quantity<0
-){
-
-alert("راجع الأسعار والكمية.");
-
-return;
-
-}
-
-products.push({
-name:name.trim(),
-buy:buy,
-sell:sell,
-quantity:quantity
-});
-
-saveData();
-
-displayProducts();
-
-}
-
-
-function increase(index){
-
-products[index].quantity++;
-
-saveData();
-
-displayProducts();
-
-}
-
-
-function decrease(index){
-
-if(products[index].quantity<=0)return;
-
-products[index].quantity--;
-
-saveData();
-
-displayProducts();
-
-}
-
-
-function sell(index){
-
-const p=products[index];
-
-if(p.quantity<=0){
-
-alert("الصنف خلص من المخزون.");
-
-return;
-
-}
-
-if(p.sell<=0){
-
-alert(
-"سعر البيع غير محدد.\n"+
-"اضغط ✏️ لتحديد سعر البيع."
-);
-
-return;
-
-}
-
-const info=getDateInfo();
-
-const sellPrice=Number(p.sell);
-const buyPrice=Number(p.buy);
-
-const profit=sellPrice-buyPrice;
-
-p.quantity--;
-
-salesHistory.push({
-
-date:info.date,
-
-month:info.month,
-
-name:p.name,
-
-sell:sellPrice,
-
-buy:buyPrice,
-
-profit:profit
-
-});
-
-saveData();
-
-displayProducts();
-
-showReports();
-
-}
-
-
-function getDaySales(){
-
-const info=getDateInfo();
-
-return salesHistory.filter(
-s=>s.date===info.date
-);
-
-}
-
-
-function getMonthSales(){
-
-const info=getDateInfo();
-
-return salesHistory.filter(
-s=>s.month===info.month
-);
-
-}
-
-
-function calculate(list){
-
-let sales=0;
-let cost=0;
-let profit=0;
-
-list.forEach(s=>{
-
-sales+=Number(s.sell)||0;
-
-cost+=Number(s.buy)||0;
-
-profit+=Number(s.profit)||0;
-
-});
-
-return {
-sales,
-cost,
-profit,
-count:list.length
-};
-
-}
-
-
-function updateSummary(){
-
-document.getElementById(
-"totalProducts"
-).textContent=products.length;
-
-let total=0;
+let value=0;
 
 products.forEach(p=>{
-total+=Number(p.quantity)||0;
+
+value +=
+(Number(p.quantity)||0) *
+(Number(p.buy)||0);
+
 });
 
-document.getElementById(
-"totalQuantity"
-).textContent=total;
-
-
-const day=calculate(
-getDaySales()
-);
-
-const month=calculate(
-getMonthSales()
-);
-
-
-document.getElementById(
-"todaySales"
-).textContent=money(day.sales);
-
-document.getElementById(
-"todayProfit"
-).textContent=money(day.profit);
-
-document.getElementById(
-"monthSales"
-).textContent=money(month.sales);
-
-document.getElementById(
-"monthProfit"
-).textContent=money(month.profit);
+return value;
 
 }
 
@@ -956,20 +20,184 @@ function showReports(){
 const reports=
 document.getElementById("reports");
 
-const dayList=getDaySales();
+const dayList=
+getDaySales();
 
-const monthList=getMonthSales();
+const monthList=
+getMonthSales();
 
-const day=calculate(dayList);
+const day=
+calculate(dayList);
 
-const month=calculate(monthList);
+const month=
+calculate(monthList);
+
+const today=
+getDateInfo();
+
+const inventoryValue=
+getInventoryValue();
+
+const soldProducts=
+getSoldProducts(dayList);
+
+
+/* تفاصيل مبيعات اليوم */
+
+let soldHTML="";
+
+if(Object.keys(soldProducts).length===0){
+
+soldHTML=
+'<div class="sold-item">لا توجد مبيعات اليوم</div>';
+
+}else{
+
+Object.keys(soldProducts).forEach(name=>{
+
+soldHTML+=`
+
+<div class="sold-item">
+
+<span>
+${escapeHtml(name)}
+</span>
+
+<strong>
+${soldProducts[name]}
+</strong>
+
+</div>
+
+`;
+
+});
+
+}
+
+
+/* جرد الشهر مقسم يوم بيوم */
+
+const days={};
+
+monthList.forEach(s=>{
+
+if(!days[s.date]){
+days[s.date]=[];
+}
+
+days[s.date].push(s);
+
+});
+
+
+let monthlyHTML="";
+
+const sortedDates=
+Object.keys(days).sort();
+
+if(sortedDates.length===0){
+
+monthlyHTML=
+'<div class="sold-item">لا توجد مبيعات هذا الشهر</div>';
+
+}else{
+
+sortedDates.forEach(date=>{
+
+const list=days[date];
+
+const stats=
+calculate(list);
+
+const sold=
+getSoldProducts(list);
+
+let itemsHTML="";
+
+Object.keys(sold).forEach(name=>{
+
+itemsHTML+=`
+
+<div class="sold-item">
+
+<span>
+${escapeHtml(name)}
+</span>
+
+<strong>
+${sold[name]}
+</strong>
+
+</div>
+
+`;
+
+});
+
+
+monthlyHTML+=`
+
+<div class="month-day">
+
+<div class="month-day-title">
+📅 ${dateTitle(date)}
+</div>
+
+<div class="report-row">
+<span>عدد القطع المباعة</span>
+<strong>${stats.count}</strong>
+</div>
+
+<div class="report-row">
+<span>إجمالي المبيعات</span>
+<strong class="green">
+${money(stats.sales)}
+</strong>
+</div>
+
+<div class="report-row">
+<span>قيمة البضاعة الموجودة</span>
+<strong>
+${money(inventoryValue)}
+</strong>
+</div>
+
+<div class="report-row">
+<span>صافي الربح</span>
+<strong class="blue">
+${money(stats.profit)}
+</strong>
+</div>
+
+<div class="sold-title">
+الأصناف المباعة:
+</div>
+
+${itemsHTML}
+
+</div>
+
+`;
+
+});
+
+}
 
 
 reports.innerHTML=`
 
 <div class="report-box">
 
-<h2>📅 جرد اليوم</h2>
+<h2>
+📅 جرد اليوم
+</h2>
+
+<div class="report-date">
+${today.dayName}
+ — 
+${today.formatted}
+</div>
 
 <div class="report-row">
 <span>عدد القطع المباعة</span>
@@ -977,16 +205,16 @@ reports.innerHTML=`
 </div>
 
 <div class="report-row">
-<span>إجمالي المبيعات</span>
+<span>إجمالي المبيعات بسعر البيع</span>
 <strong class="green">
 ${money(day.sales)}
 </strong>
 </div>
 
 <div class="report-row">
-<span>تكلفة البضاعة</span>
+<span>قيمة البضاعة الموجودة بسعر الشراء</span>
 <strong>
-${money(day.cost)}
+${money(inventoryValue)}
 </strong>
 </div>
 
@@ -997,100 +225,55 @@ ${money(day.profit)}
 </strong>
 </div>
 
+<div class="sold-title">
+الأصناف المباعة وعدد القطع:
+</div>
+
+${soldHTML}
+
 </div>
 
 
 <div class="report-box">
 
-<h2>📆 جرد الشهر</h2>
+<h2>
+📆 الجرد الشهري
+</h2>
 
 <div class="report-row">
-<span>عدد القطع المباعة</span>
-<strong>${month.count}</strong>
+<span>إجمالي القطع المباعة</span>
+<strong>
+${month.count}
+</strong>
 </div>
 
 <div class="report-row">
-<span>إجمالي المبيعات</span>
+<span>إجمالي المبيعات بسعر البيع</span>
 <strong class="green">
 ${money(month.sales)}
 </strong>
 </div>
 
 <div class="report-row">
-<span>تكلفة البضاعة</span>
+<span>قيمة البضاعة الموجودة حاليًا</span>
 <strong>
-${money(month.cost)}
+${money(inventoryValue)}
 </strong>
 </div>
 
 <div class="report-row">
-<span>صافي الربح</span>
+<span>إجمالي صافي الربح</span>
 <strong class="blue">
 ${money(month.profit)}
 </strong>
 </div>
+
+<hr>
+
+${monthlyHTML}
 
 </div>
 
 `;
 
 }
-
-
-function resetData(){
-
-const answer=confirm(
-"إعادة الكميات للوضع الافتراضي؟\n\n"+
-"المبيعات والأسعار لن يتم حذفها."
-);
-
-if(!answer)return;
-
-products=products.map(
-(product,index)=>({
-
-...product,
-
-quantity:
-defaultProducts[index]
-?defaultProducts[index].quantity
-:product.quantity
-
-})
-);
-
-saveData();
-
-displayProducts();
-
-}
-
-
-/* تشغيل التطبيق بدون إنترنت */
-
-if("serviceWorker" in navigator){
-
-window.addEventListener("load",()=>{
-
-navigator.serviceWorker
-.register("./sw.js")
-.catch(error=>{
-console.log(
-"Service Worker Error:",
-error
-);
-});
-
-});
-
-}
-
-
-/* تشغيل التطبيق */
-
-displayProducts();
-
-</script>
-
-</body>
-</html>
