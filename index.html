@@ -1,118 +1,12 @@
 /* =========================================
-   تفاصيل البضاعة الموجودة
-========================================= */
-
-function showInventoryDetails(){
-
-    const details =
-        document.getElementById("inventoryDetails");
-
-    if(!details) return;
-
-    let html = "";
-
-    if(!Array.isArray(products) || products.length === 0){
-
-        html =
-            '<div class="sold-item">لا توجد بضاعة</div>';
-
-    }else{
-
-        products.forEach(p => {
-
-            const quantity =
-                Number(p.quantity) || 0;
-
-            const buy =
-                Number(p.buy) || 0;
-
-            const total =
-                quantity * buy;
-
-            html += `
-
-            <div class="report-row">
-
-                <span>
-
-                    <strong>
-                        ${escapeHtml(p.name || "")}
-                    </strong>
-
-                    <br>
-
-                    <small>
-                        الكمية: ${quantity}
-                        ×
-                        سعر الجملة: ${money(buy)}
-                    </small>
-
-                </span>
-
-                <strong>
-                    ${money(total)}
-                </strong>
-
-            </div>
-
-            `;
-
-        });
-
-    }
-
-    details.innerHTML = `
-
-        <div class="report-box">
-
-            <h2>
-                📦 تفاصيل البضاعة الموجودة
-            </h2>
-
-            ${html}
-
-        </div>
-
-    `;
-}
-
-
-/* =========================================
-   إظهار وإخفاء تفاصيل المخزون
-========================================= */
-
-function toggleInventoryDetails(){
-
-    const details =
-        document.getElementById("inventoryDetails");
-
-    if(!details) return;
-
-    if(details.innerHTML.trim() !== ""){
-
-        details.innerHTML = "";
-
-    }else{
-
-        showInventoryDetails();
-
-    }
-
-}
-
-
-/* =========================================
    البيع الفعلي
 ========================================= */
 
 function sellProduct(product, salePrice = 0){
 
     if(!product){
-
         return false;
-
     }
-
 
     const quantity =
         Number(product.quantity) || 0;
@@ -126,7 +20,6 @@ function sellProduct(product, salePrice = 0){
         Number(product.price) ||
         0;
 
-
     if(quantity <= 0){
 
         alert("الصنف غير متوفر في المخزون");
@@ -134,7 +27,6 @@ function sellProduct(product, salePrice = 0){
         return false;
 
     }
-
 
     /* خصم قطعة واحدة */
 
@@ -197,23 +89,6 @@ function sellProduct(product, salePrice = 0){
             "خطأ في حفظ المخزون:",
             error
         );
-
-    }
-
-
-    /* تحديث التفاصيل لو مفتوحة */
-
-    const details =
-        document.getElementById(
-            "inventoryDetails"
-        );
-
-    if(
-        details &&
-        details.innerHTML.trim() !== ""
-    ){
-
-        showInventoryDetails();
 
     }
 
@@ -449,47 +324,75 @@ function showReports(){
         getDateInfo();
 
 
-    const soldProducts =
-        getSoldProducts(dayList);
-
-
     /* =====================================
-       مبيعات اليوم
+       تفاصيل مبيعات اليوم
     ===================================== */
 
     let soldHTML = "";
 
 
-    if(
-        Object.keys(soldProducts).length === 0
-    ){
+    if(!Array.isArray(dayList) || dayList.length === 0){
 
         soldHTML =
             '<div class="sold-item">لا توجد مبيعات اليوم</div>';
 
     }else{
 
-        Object.keys(soldProducts).forEach(
-            name => {
+        dayList.forEach(s => {
 
-                soldHTML += `
+            const quantity =
+                Number(s.quantity) || 1;
 
-                <div class="sold-item">
+            const buy =
+                Number(s.buy) || 0;
 
-                    <span>
-                        ${escapeHtml(name)}
-                    </span>
+            const sell =
+                Number(s.sell) || 0;
+
+            const profit =
+                Number(s.profit) ||
+                ((sell - buy) * quantity);
+
+
+            soldHTML += `
+
+            <div class="sold-item">
+
+                <div>
 
                     <strong>
-                        ${soldProducts[name]}
+                        ${escapeHtml(s.name || "")}
                     </strong>
+
+                    <br>
+
+                    <small>
+                        الكمية: ${quantity}
+                    </small>
+
+                    <br>
+
+                    <small>
+                        سعر الشراء: ${money(buy)}
+                    </small>
+
+                    <br>
+
+                    <small>
+                        سعر البيع: ${money(sell)}
+                    </small>
 
                 </div>
 
-                `;
+                <strong class="blue">
+                    الربح: ${money(profit)}
+                </strong>
 
-            }
-        );
+            </div>
+
+            `;
+
+        });
 
     }
 
@@ -547,16 +450,91 @@ function showReports(){
 
             Object.keys(sold).forEach(name => {
 
+                const productSales =
+                    list.filter(
+                        s =>
+                            String(s.name || "").trim() ===
+                            String(name || "").trim()
+                    );
+
+
+                let quantity = 0;
+                let buyTotal = 0;
+                let sellTotal = 0;
+                let profitTotal = 0;
+
+
+                productSales.forEach(s => {
+
+                    const qty =
+                        Number(s.quantity) || 1;
+
+                    const buy =
+                        Number(s.buy) || 0;
+
+                    const sell =
+                        Number(s.sell) || 0;
+
+                    const profit =
+                        Number(s.profit) ||
+                        ((sell - buy) * qty);
+
+
+                    quantity += qty;
+
+                    buyTotal += buy * qty;
+
+                    sellTotal += sell * qty;
+
+                    profitTotal += profit;
+
+                });
+
+
+                const averageBuy =
+                    quantity > 0
+                        ? buyTotal / quantity
+                        : 0;
+
+
+                const averageSell =
+                    quantity > 0
+                        ? sellTotal / quantity
+                        : 0;
+
+
                 itemsHTML += `
 
                 <div class="sold-item">
 
-                    <span>
-                        ${escapeHtml(name)}
-                    </span>
+                    <div>
 
-                    <strong>
-                        ${sold[name]}
+                        <strong>
+                            ${escapeHtml(name)}
+                        </strong>
+
+                        <br>
+
+                        <small>
+                            الكمية: ${quantity}
+                        </small>
+
+                        <br>
+
+                        <small>
+                            سعر الشراء: ${money(averageBuy)}
+                        </small>
+
+                        <br>
+
+                        <small>
+                            سعر البيع: ${money(averageSell)}
+                        </small>
+
+                    </div>
+
+                    <strong class="blue">
+                        الربح: ${money(profitTotal)}
                     </strong>
 
                 </div>
@@ -591,7 +569,7 @@ function showReports(){
                 <div class="report-row">
 
                     <span>
-                        إجمالي المبيعات
+                        إجمالي المبيعات بسعر البيع
                     </span>
 
                     <strong class="green">
@@ -689,7 +667,7 @@ function showReports(){
 
 
         <div class="sold-title">
-            الأصناف المباعة وعدد القطع:
+            الأصناف المباعة بالتفصيل:
         </div>
 
 
@@ -750,9 +728,6 @@ function showReports(){
         ${monthlyHTML}
 
     </div>
-
-
-    <div id="inventoryDetails"></div>
 
     `;
 
