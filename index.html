@@ -1,12 +1,12 @@
 function getInventoryValue(){
 
-let value=0;
+let value = 0;
 
-products.forEach(p=>{
+products.forEach(p => {
 
 value +=
-(Number(p.quantity)||0) *
-(Number(p.buy)||0);
+(Number(p.quantity) || 0) *
+(Number(p.buy) || 0);
 
 });
 
@@ -15,47 +15,153 @@ return value;
 }
 
 
+/* تفاصيل البضاعة الموجودة */
+
+function showInventoryDetails(){
+
+const details =
+document.getElementById("inventoryDetails");
+
+if(!details) return;
+
+let html = "";
+
+products.forEach(p => {
+
+const quantity =
+Number(p.quantity) || 0;
+
+const buy =
+Number(p.buy) || 0;
+
+const total =
+quantity * buy;
+
+html += `
+
+<div class="report-row">
+
+<span>
+
+<strong>
+${escapeHtml(p.name)}
+</strong>
+
+<br>
+
+<small>
+الكمية: ${quantity}
+ ×
+سعر الجملة: ${money(buy)}
+</small>
+
+</span>
+
+<strong>
+${money(total)}
+</strong>
+
+</div>
+
+`;
+
+});
+
+
+details.innerHTML = `
+
+<div class="report-box">
+
+<h2>
+📦 تفاصيل البضاعة الموجودة
+</h2>
+
+${html || '<div class="sold-item">لا توجد بضاعة</div>'}
+
+<hr>
+
+<div class="report-row">
+
+<span>
+<strong>إجمالي تكلفة البضاعة</strong>
+</span>
+
+<strong class="blue">
+${money(getInventoryValue())}
+</strong>
+
+</div>
+
+</div>
+
+`;
+
+}
+
+
+/* إظهار وإخفاء تفاصيل البضاعة */
+
+function toggleInventoryDetails(){
+
+const details =
+document.getElementById("inventoryDetails");
+
+if(!details) return;
+
+if(details.innerHTML.trim() !== ""){
+
+details.innerHTML = "";
+
+}else{
+
+showInventoryDetails();
+
+}
+
+}
+
+
 function showReports(){
 
-const reports=
+const reports =
 document.getElementById("reports");
 
-const dayList=
+const dayList =
 getDaySales();
 
-const monthList=
+const monthList =
 getMonthSales();
 
-const day=
+const day =
 calculate(dayList);
 
-const month=
+const month =
 calculate(monthList);
 
-const today=
+const today =
 getDateInfo();
 
-const inventoryValue=
+const inventoryValue =
 getInventoryValue();
 
-const soldProducts=
+const soldProducts =
 getSoldProducts(dayList);
 
 
 /* تفاصيل مبيعات اليوم */
 
-let soldHTML="";
+let soldHTML = "";
 
-if(Object.keys(soldProducts).length===0){
+if(Object.keys(soldProducts).length === 0){
 
-soldHTML=
+soldHTML =
 '<div class="sold-item">لا توجد مبيعات اليوم</div>';
 
 }else{
 
-Object.keys(soldProducts).forEach(name=>{
+Object.keys(soldProducts).forEach(name => {
 
-soldHTML+=`
+soldHTML += `
 
 <div class="sold-item">
 
@@ -78,12 +184,12 @@ ${soldProducts[name]}
 
 /* جرد الشهر مقسم يوم بيوم */
 
-const days={};
+const days = {};
 
-monthList.forEach(s=>{
+monthList.forEach(s => {
 
 if(!days[s.date]){
-days[s.date]=[];
+days[s.date] = [];
 }
 
 days[s.date].push(s);
@@ -91,33 +197,34 @@ days[s.date].push(s);
 });
 
 
-let monthlyHTML="";
+let monthlyHTML = "";
 
-const sortedDates=
+const sortedDates =
 Object.keys(days).sort();
 
-if(sortedDates.length===0){
+if(sortedDates.length === 0){
 
-monthlyHTML=
+monthlyHTML =
 '<div class="sold-item">لا توجد مبيعات هذا الشهر</div>';
 
 }else{
 
-sortedDates.forEach(date=>{
+sortedDates.forEach(date => {
 
-const list=days[date];
+const list =
+days[date];
 
-const stats=
+const stats =
 calculate(list);
 
-const sold=
+const sold =
 getSoldProducts(list);
 
-let itemsHTML="";
+let itemsHTML = "";
 
-Object.keys(sold).forEach(name=>{
+Object.keys(sold).forEach(name => {
 
-itemsHTML+=`
+itemsHTML += `
 
 <div class="sold-item">
 
@@ -136,7 +243,7 @@ ${sold[name]}
 });
 
 
-monthlyHTML+=`
+monthlyHTML += `
 
 <div class="month-day">
 
@@ -145,29 +252,55 @@ monthlyHTML+=`
 </div>
 
 <div class="report-row">
-<span>عدد القطع المباعة</span>
-<strong>${stats.count}</strong>
+
+<span>
+عدد القطع المباعة
+</span>
+
+<strong>
+${stats.count}
+</strong>
+
 </div>
 
 <div class="report-row">
-<span>إجمالي المبيعات</span>
+
+<span>
+إجمالي المبيعات
+</span>
+
 <strong class="green">
 ${money(stats.sales)}
 </strong>
+
 </div>
 
 <div class="report-row">
-<span>قيمة البضاعة الموجودة</span>
-<strong>
+
+<span>
+قيمة البضاعة الموجودة بسعر الجملة
+</span>
+
+<strong
+onclick="toggleInventoryDetails()"
+style="cursor:pointer;text-decoration:underline;">
+
 ${money(inventoryValue)}
+
 </strong>
+
 </div>
 
 <div class="report-row">
-<span>صافي الربح</span>
+
+<span>
+صافي الربح
+</span>
+
 <strong class="blue">
 ${money(stats.profit)}
 </strong>
+
 </div>
 
 <div class="sold-title">
@@ -185,7 +318,7 @@ ${itemsHTML}
 }
 
 
-reports.innerHTML=`
+reports.innerHTML = `
 
 <div class="report-box">
 
@@ -195,34 +328,60 @@ reports.innerHTML=`
 
 <div class="report-date">
 ${today.dayName}
- — 
+—
 ${today.formatted}
 </div>
 
 <div class="report-row">
-<span>عدد القطع المباعة</span>
-<strong>${day.count}</strong>
+
+<span>
+عدد القطع المباعة
+</span>
+
+<strong>
+${day.count}
+</strong>
+
 </div>
 
 <div class="report-row">
-<span>إجمالي المبيعات بسعر البيع</span>
+
+<span>
+إجمالي المبيعات بسعر البيع
+</span>
+
 <strong class="green">
 ${money(day.sales)}
 </strong>
+
 </div>
 
 <div class="report-row">
-<span>قيمة البضاعة الموجودة بسعر الشراء</span>
-<strong>
+
+<span>
+قيمة البضاعة الموجودة بسعر الجملة
+</span>
+
+<strong
+onclick="toggleInventoryDetails()"
+style="cursor:pointer;text-decoration:underline;">
+
 ${money(inventoryValue)}
+
 </strong>
+
 </div>
 
 <div class="report-row">
-<span>صافي الربح</span>
+
+<span>
+صافي الربح
+</span>
+
 <strong class="blue">
 ${money(day.profit)}
 </strong>
+
 </div>
 
 <div class="sold-title">
@@ -241,31 +400,55 @@ ${soldHTML}
 </h2>
 
 <div class="report-row">
-<span>إجمالي القطع المباعة</span>
+
+<span>
+إجمالي القطع المباعة
+</span>
+
 <strong>
 ${month.count}
 </strong>
+
 </div>
 
 <div class="report-row">
-<span>إجمالي المبيعات بسعر البيع</span>
+
+<span>
+إجمالي المبيعات بسعر البيع
+</span>
+
 <strong class="green">
 ${money(month.sales)}
 </strong>
+
 </div>
 
 <div class="report-row">
-<span>قيمة البضاعة الموجودة حاليًا</span>
-<strong>
+
+<span>
+قيمة البضاعة الموجودة حاليًا بسعر الجملة
+</span>
+
+<strong
+onclick="toggleInventoryDetails()"
+style="cursor:pointer;text-decoration:underline;">
+
 ${money(inventoryValue)}
+
 </strong>
+
 </div>
 
 <div class="report-row">
-<span>إجمالي صافي الربح</span>
+
+<span>
+إجمالي صافي الربح
+</span>
+
 <strong class="blue">
 ${money(month.profit)}
 </strong>
+
 </div>
 
 <hr>
@@ -273,6 +456,9 @@ ${money(month.profit)}
 ${monthlyHTML}
 
 </div>
+
+
+<div id="inventoryDetails"></div>
 
 `;
 
