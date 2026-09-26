@@ -106,7 +106,7 @@ function showInventoryDetails(){
 
                 <span>
                     <strong>
-                        إجمالي قيمة البضاعة
+                        إجمالي سعر البضاعة
                     </strong>
                 </span>
 
@@ -142,11 +142,12 @@ function toggleInventoryDetails(){
         showInventoryDetails();
 
     }
+
 }
 
 
 /* =========================================
-   تحديث قيمة المخزون
+   تحديث قيم البضاعة
 ========================================= */
 
 function refreshInventoryValue(){
@@ -397,6 +398,33 @@ function decreaseProductQuantity(product){
         quantity - 1;
 
 
+    /* حفظ التغيير */
+
+    try{
+
+        if(typeof saveProducts === "function"){
+
+            saveProducts();
+
+        }else{
+
+            localStorage.setItem(
+                "products",
+                JSON.stringify(products)
+            );
+
+        }
+
+    }catch(error){
+
+        console.log(
+            "خطأ في حفظ المخزون:",
+            error
+        );
+
+    }
+
+
     refreshInventoryValue();
 
 
@@ -502,6 +530,10 @@ function showReports(){
     const today =
         getDateInfo();
 
+
+    /* =====================================
+       قيمة البضاعة الحالية
+    ===================================== */
 
     const inventoryValue =
         getInventoryValue();
@@ -682,6 +714,19 @@ function showReports(){
                 <div class="report-row">
 
                     <span>
+                        إجمالي سعر البضاعة
+                    </span>
+
+                    <strong class="blue">
+                        ${money(inventoryValue)}
+                    </strong>
+
+                </div>
+
+
+                <div class="report-row">
+
+                    <span>
                         صافي الربح
                     </span>
 
@@ -776,6 +821,19 @@ function showReports(){
         <div class="report-row">
 
             <span>
+                إجمالي سعر البضاعة
+            </span>
+
+            <strong class="blue">
+                ${money(inventoryValue)}
+            </strong>
+
+        </div>
+
+
+        <div class="report-row">
+
+            <span>
                 صافي الربح
             </span>
 
@@ -843,6 +901,19 @@ function showReports(){
                     text-decoration:underline;
                 "
             >
+                ${money(inventoryValue)}
+            </strong>
+
+        </div>
+
+
+        <div class="report-row">
+
+            <span>
+                إجمالي سعر البضاعة
+            </span>
+
+            <strong class="blue">
                 ${money(inventoryValue)}
             </strong>
 
