@@ -24,7 +24,6 @@ function getInventoryValue(){
     });
 
     return value;
-
 }
 
 
@@ -91,7 +90,6 @@ function showInventoryDetails(){
 
     }
 
-
     details.innerHTML = `
 
         <div class="report-box">
@@ -108,7 +106,7 @@ function showInventoryDetails(){
 
                 <span>
                     <strong>
-                        إجمالي تكلفة البضاعة
+                        إجمالي قيمة البضاعة
                     </strong>
                 </span>
 
@@ -121,7 +119,6 @@ function showInventoryDetails(){
         </div>
 
     `;
-
 }
 
 
@@ -145,12 +142,11 @@ function toggleInventoryDetails(){
         showInventoryDetails();
 
     }
-
 }
 
 
 /* =========================================
-   تحديث قيمة المخزون بعد البيع أو الإضافة
+   تحديث قيمة المخزون
 ========================================= */
 
 function refreshInventoryValue(){
@@ -174,6 +170,310 @@ function refreshInventoryValue(){
 
 
 /* =========================================
+   البيع الفعلي
+========================================= */
+
+function sellProduct(product, salePrice = 0){
+
+    if(!product){
+
+        return false;
+
+    }
+
+    const quantity =
+        Number(product.quantity) || 0;
+
+    const buy =
+        Number(product.buy) || 0;
+
+    const sell =
+        Number(salePrice) ||
+        Number(product.sell) ||
+        Number(product.price) ||
+        0;
+
+
+    if(quantity <= 0){
+
+        alert("الصنف غير متوفر في المخزون");
+
+        return false;
+
+    }
+
+
+    /* خصم قطعة واحدة */
+
+    product.quantity =
+        quantity - 1;
+
+
+    /* =====================================
+       تسجيل عملية البيع
+    ===================================== */
+
+    if(!Array.isArray(window.sales)){
+
+        window.sales = [];
+
+    }
+
+
+    window.sales.push({
+
+        name:
+            product.name || "",
+
+        buy:
+            buy,
+
+        sell:
+            sell,
+
+        profit:
+            sell - buy,
+
+        quantity:
+            1,
+
+        date:
+            new Date().toISOString()
+
+    });
+
+
+    /* =====================================
+       حفظ المخزون
+    ===================================== */
+
+    try{
+
+        if(typeof saveProducts === "function"){
+
+            saveProducts();
+
+        }else{
+
+            localStorage.setItem(
+                "products",
+                JSON.stringify(products)
+            );
+
+        }
+
+    }catch(error){
+
+        console.log(
+            "خطأ في حفظ المخزون:",
+            error
+        );
+
+    }
+
+
+    /* =====================================
+       تحديث قيمة البضاعة
+    ===================================== */
+
+    refreshInventoryValue();
+
+
+    /* تحديث التفاصيل لو مفتوحة */
+
+    const details =
+        document.getElementById(
+            "inventoryDetails"
+        );
+
+    if(
+        details &&
+        details.innerHTML.trim() !== ""
+    ){
+
+        showInventoryDetails();
+
+    }
+
+
+    return true;
+
+}
+
+
+/* =========================================
+   البيع عن طريق رقم الصنف
+========================================= */
+
+function sellProductByIndex(
+    index,
+    salePrice = 0
+){
+
+    if(
+        !Array.isArray(products) ||
+        index < 0 ||
+        index >= products.length
+    ){
+
+        return false;
+
+    }
+
+
+    return sellProduct(
+        products[index],
+        salePrice
+    );
+
+}
+
+
+/* =========================================
+   البيع عن طريق اسم الصنف
+========================================= */
+
+function sellProductByName(
+    name,
+    salePrice = 0
+){
+
+    if(!Array.isArray(products)){
+
+        return false;
+
+    }
+
+
+    const product =
+        products.find(
+            p =>
+                String(p.name || "").trim() ===
+                String(name || "").trim()
+        );
+
+
+    if(!product){
+
+        alert("الصنف غير موجود");
+
+        return false;
+
+    }
+
+
+    return sellProduct(
+        product,
+        salePrice
+    );
+
+}
+
+
+/* =========================================
+   خصم قطعة من المخزون
+========================================= */
+
+function decreaseProductQuantity(product){
+
+    if(!product){
+
+        return false;
+
+    }
+
+    const quantity =
+        Number(product.quantity) || 0;
+
+
+    if(quantity <= 0){
+
+        return false;
+
+    }
+
+
+    product.quantity =
+        quantity - 1;
+
+
+    refreshInventoryValue();
+
+
+    return true;
+
+}
+
+
+/* =========================================
+   إضافة كمية للمخزون
+========================================= */
+
+function increaseProductQuantity(
+    product,
+    amount = 1
+){
+
+    if(!product){
+
+        return false;
+
+    }
+
+
+    const add =
+        Number(amount) || 0;
+
+
+    if(add <= 0){
+
+        return false;
+
+    }
+
+
+    const quantity =
+        Number(product.quantity) || 0;
+
+
+    product.quantity =
+        quantity + add;
+
+
+    try{
+
+        if(typeof saveProducts === "function"){
+
+            saveProducts();
+
+        }else{
+
+            localStorage.setItem(
+                "products",
+                JSON.stringify(products)
+            );
+
+        }
+
+    }catch(error){
+
+        console.log(
+            "خطأ في حفظ المخزون:",
+            error
+        );
+
+    }
+
+
+    refreshInventoryValue();
+
+
+    return true;
+
+}
+
+
+/* =========================================
    تقرير المبيعات والمخزون
 ========================================= */
 
@@ -182,11 +482,15 @@ function showReports(){
     const reports =
         document.getElementById("reports");
 
+    if(!reports) return;
+
+
     const dayList =
         getDaySales();
 
     const monthList =
         getMonthSales();
+
 
     const day =
         calculate(dayList);
@@ -194,68 +498,73 @@ function showReports(){
     const month =
         calculate(monthList);
 
+
     const today =
         getDateInfo();
 
-    /*
-       هنا يتم حساب تكلفة البضاعة
-       من الكميات الموجودة حاليًا
-       × سعر الجملة
-    */
 
     const inventoryValue =
         getInventoryValue();
+
 
     const soldProducts =
         getSoldProducts(dayList);
 
 
     /* =====================================
-       تفاصيل مبيعات اليوم
+       مبيعات اليوم
     ===================================== */
 
     let soldHTML = "";
 
-    if(Object.keys(soldProducts).length === 0){
+
+    if(
+        Object.keys(soldProducts).length === 0
+    ){
 
         soldHTML =
             '<div class="sold-item">لا توجد مبيعات اليوم</div>';
 
     }else{
 
-        Object.keys(soldProducts).forEach(name => {
+        Object.keys(soldProducts).forEach(
+            name => {
 
-            soldHTML += `
+                soldHTML += `
 
-            <div class="sold-item">
+                <div class="sold-item">
 
-                <span>
-                    ${escapeHtml(name)}
-                </span>
+                    <span>
+                        ${escapeHtml(name)}
+                    </span>
 
-                <strong>
-                    ${soldProducts[name]}
-                </strong>
+                    <strong>
+                        ${soldProducts[name]}
+                    </strong>
 
-            </div>
+                </div>
 
-            `;
+                `;
 
-        });
+            }
+        );
 
     }
 
 
     /* =====================================
-       جرد الشهر مقسم يوم بيوم
+       جرد الشهر
     ===================================== */
 
     const days = {};
 
+
     monthList.forEach(s => {
 
         if(!days[s.date]){
+
             days[s.date] = [];
+
         }
 
         days[s.date].push(s);
@@ -264,6 +573,7 @@ function showReports(){
 
 
     let monthlyHTML = "";
+
 
     const sortedDates =
         Object.keys(days).sort();
@@ -281,11 +591,14 @@ function showReports(){
             const list =
                 days[date];
 
+
             const stats =
                 calculate(list);
 
+
             const sold =
                 getSoldProducts(list);
+
 
             let itemsHTML = "";
 
@@ -477,6 +790,7 @@ function showReports(){
             الأصناف المباعة وعدد القطع:
         </div>
 
+
         ${soldHTML}
 
     </div>
@@ -550,6 +864,7 @@ function showReports(){
 
         <hr>
 
+
         ${monthlyHTML}
 
     </div>
@@ -558,63 +873,5 @@ function showReports(){
     <div id="inventoryDetails"></div>
 
     `;
-
-}
-
-
-/* =========================================
-   خصم قطعة من المخزون
-   =========================================
-   
-   هذه الدالة مستقلة.
-   عند بيع قطعة:
-   الكمية تقل 1
-   وبالتالي getInventoryValue()
-   تنخفض بسعر الجملة تلقائيًا.
-========================================= */
-
-function decreaseProductQuantity(product){
-
-    if(!product) return false;
-
-    const quantity =
-        Number(product.quantity) || 0;
-
-    if(quantity <= 0){
-        return false;
-    }
-
-    product.quantity =
-        quantity - 1;
-
-    refreshInventoryValue();
-
-    return true;
-
-}
-
-
-/* =========================================
-   إضافة كمية للمخزون
-   ========================================= */
-
-function increaseProductQuantity(product, amount = 1){
-
-    if(!product) return false;
-
-    const add =
-        Number(amount) || 0;
-
-    if(add <= 0) return false;
-
-    const quantity =
-        Number(product.quantity) || 0;
-
-    product.quantity =
-        quantity + add;
-
-    refreshInventoryValue();
-
-    return true;
 
 }
