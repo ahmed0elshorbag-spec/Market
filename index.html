@@ -3,120 +3,595 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="theme-color" content="#0d6efd">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
   <title>ميني ماركت الشوربجي</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, Tahoma, sans-serif;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
       margin: 0;
-      padding: 20px;
+      background: #f3f6f9;
+      color: #222;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0d6efd, #084298);
+      color: white;
+      padding: 20px 15px;
+      text-align: center;
+      box-shadow: 0 3px 10px #0002;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 25px;
+    }
+
+    header p {
+      margin: 8px 0 0;
+      font-size: 14px;
     }
 
     .container {
-      max-width: 600px;
-      margin: auto;
+      width: 94%;
+      max-width: 900px;
+      margin: 20px auto;
+    }
+
+    .search {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      font-size: 17px;
+      margin-bottom: 15px;
+      outline: none;
+    }
+
+    .search:focus {
+      border-color: #0d6efd;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .box {
       background: white;
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 3px 10px #ccc;
-    }
-
-    h1 {
+      padding: 15px 8px;
+      border-radius: 12px;
       text-align: center;
-      color: #198754;
+      box-shadow: 0 2px 8px #0001;
     }
 
-    .item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .box strong {
+      display: block;
+      font-size: 20px;
+      color: #0d6efd;
+      margin-top: 5px;
+    }
+
+    .product {
+      background: white;
+      border-radius: 15px;
       padding: 15px;
-      margin: 10px 0;
-      background: #f1f1f1;
-      border-radius: 10px;
-      font-size: 18px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px #0001;
+    }
+
+    .product h3 {
+      margin: 0 0 8px;
+      font-size: 19px;
     }
 
     .price {
       color: #198754;
       font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .quantity {
+      margin: 8px 0;
+      color: #555;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
     }
 
     button {
-      width: 100%;
-      padding: 15px;
-      margin-top: 15px;
       border: none;
       border-radius: 10px;
-      background: #198754;
+      padding: 11px 10px;
+      font-size: 16px;
+      cursor: pointer;
       color: white;
-      font-size: 18px;
+    }
+
+    .minus {
+      background: #dc3545;
+    }
+
+    .plus {
+      background: #198754;
+    }
+
+    .sell {
+      background: #0d6efd;
+    }
+
+    .edit-price {
+      background: #f59f00;
+    }
+
+    .reset {
+      background: #6c757d;
+      width: 100%;
+      margin-top: 15px;
+    }
+
+    .empty {
+      text-align: center;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      color: #777;
+    }
+
+    @media (max-width: 600px) {
+      .summary {
+        grid-template-columns: 1fr;
+      }
+
+      header h1 {
+        font-size: 22px;
+      }
+
+      .product h3 {
+        font-size: 18px;
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <div class="container">
+<header>
+  <h1>🛒 ميني ماركت الشوربجي</h1>
+  <p>إدارة المخزون والمبيعات</p>
+</header>
 
-    <h1>🛒 ميني ماركت الشوربجي</h1>
+<div class="container">
 
-    <div class="item">
-      <span>مية صغيرة سيوة</span>
-      <span class="price">5 جنيه</span>
+  <input
+    id="search"
+    class="search"
+    type="text"
+    placeholder="🔎 ابحث عن الصنف..."
+    oninput="displayProducts()"
+  >
+
+  <div class="summary">
+
+    <div class="box">
+      الأصناف
+      <strong id="totalProducts">0</strong>
     </div>
 
-    <div class="item">
-      <span>مية كبيرة</span>
-      <span class="price">8.30 جنيه</span>
+    <div class="box">
+      إجمالي الكمية
+      <strong id="totalQuantity">0</strong>
     </div>
 
-    <div class="item">
-      <span>بسكوت بـ 5</span>
-      <span class="price">4 جنيه</span>
+    <div class="box">
+      مبيعات اليوم
+      <strong id="todaySales">0 ج</strong>
     </div>
-
-    <div class="item">
-      <span>بسكوت بـ 10</span>
-      <span class="price">8 جنيه</span>
-    </div>
-
-    <div class="item">
-      <span>كوفي ميكس</span>
-      <span class="price">—</span>
-    </div>
-
-    <div class="item">
-      <span>إندومي صغير</span>
-      <span class="price">—</span>
-    </div>
-
-    <div class="item">
-      <span>شيبسي بـ 10</span>
-      <span class="price">—</span>
-    </div>
-
-    <div class="item">
-      <span>كنز</span>
-      <span class="price">—</span>
-    </div>
-
-    <div class="item">
-      <span>عصير مانجا</span>
-      <span class="price">—</span>
-    </div>
-
-    <div class="item">
-      <span>عصير برتقال</span>
-      <span class="price">—</span>
-    </div>
-
-    <button onclick="alert('أهلاً بك في ميني ماركت الشوربجي 🛒')">
-      فتح الماركت
-    </button>
 
   </div>
 
+  <div id="products"></div>
+
+  <button class="reset" onclick="resetData()">
+    🔄 إعادة ضبط الكميات
+  </button>
+
+</div>
+
+<script>
+
+const defaultProducts = [
+
+  {
+    name: "ميه صغيرة سيوه",
+    price: 5,
+    quantity: 20
+  },
+
+  {
+    name: "ميه كبيرة",
+    price: 8.30,
+    quantity: 20
+  },
+
+  {
+    name: "بسكوت بـ5",
+    price: 4,
+    quantity: 20
+  },
+
+  {
+    name: "بسكوت بـ10",
+    price: 8,
+    quantity: 20
+  },
+
+  {
+    name: "كوفي ميكس",
+    price: 0,
+    quantity: 20
+  },
+
+  {
+    name: "إندومي صغير",
+    price: 4.38,
+    quantity: 48
+  },
+
+  {
+    name: "شيبسي بـ10",
+    price: 10,
+    quantity: 20
+  },
+
+  {
+    name: "كنز 285 مللي",
+    price: 10,
+    quantity: 20
+  },
+
+  {
+    name: "عصير مانجا",
+    price: 0,
+    quantity: 27
+  },
+
+  {
+    name: "عصير برتقال",
+    price: 0,
+    quantity: 27
+  },
+
+  {
+    name: "عصير ميكس فراولة",
+    price: 0,
+    quantity: 27
+  }
+
+];
+
+
+let products =
+  JSON.parse(localStorage.getItem("marketProducts")) ||
+  JSON.parse(JSON.stringify(defaultProducts));
+
+
+let sales =
+  Number(localStorage.getItem("marketSales")) || 0;
+
+
+function saveData() {
+
+  localStorage.setItem(
+    "marketProducts",
+    JSON.stringify(products)
+  );
+
+  localStorage.setItem(
+    "marketSales",
+    sales
+  );
+
+}
+
+
+function displayProducts() {
+
+  const container =
+    document.getElementById("products");
+
+  const search =
+    document
+      .getElementById("search")
+      .value
+      .trim()
+      .toLowerCase();
+
+  container.innerHTML = "";
+
+  const filtered =
+    products.filter(product =>
+      product.name.toLowerCase().includes(search)
+    );
+
+
+  if (filtered.length === 0) {
+
+    container.innerHTML =
+      '<div class="empty">لا يوجد صنف بهذا الاسم</div>';
+
+    updateSummary();
+
+    return;
+  }
+
+
+  filtered.forEach((product) => {
+
+    const realIndex =
+      products.indexOf(product);
+
+    const div =
+      document.createElement("div");
+
+    div.className = "product";
+
+
+    div.innerHTML = `
+
+      <h3>${product.name}</h3>
+
+      <div class="price">
+        سعر البيع:
+        ${
+          product.price > 0
+          ? Number(product.price).toFixed(2) + " ج"
+          : "غير محدد"
+        }
+      </div>
+
+      <div class="quantity">
+        الكمية:
+        <strong>${product.quantity}</strong>
+      </div>
+
+      <div class="buttons">
+
+        <button
+          class="edit-price"
+          onclick="editPrice(${realIndex})">
+          💰 تعديل السعر
+        </button>
+
+        <button
+          class="sell"
+          onclick="sell(${realIndex})">
+          🛒 بيع
+        </button>
+
+        <button
+          class="minus"
+          onclick="decrease(${realIndex})">
+          − نقص قطعة
+        </button>
+
+        <button
+          class="plus"
+          onclick="increase(${realIndex})">
+          + زود قطعة
+        </button>
+
+      </div>
+
+    `;
+
+    container.appendChild(div);
+
+  });
+
+
+  updateSummary();
+
+}
+
+
+function editPrice(index) {
+
+  const oldPrice =
+    products[index].price > 0
+      ? products[index].price
+      : "";
+
+  const newPrice =
+    prompt(
+      "اكتب سعر البيع الجديد للصنف:\n" +
+      products[index].name,
+      oldPrice
+    );
+
+
+  if (newPrice === null) {
+    return;
+  }
+
+
+  const price =
+    Number(
+      newPrice.replace(",", ".")
+    );
+
+
+  if (
+    newPrice.trim() === "" ||
+    !Number.isFinite(price) ||
+    price < 0
+  ) {
+
+    alert("من فضلك اكتب سعر صحيح.");
+
+    return;
+  }
+
+
+  products[index].price = price;
+
+  saveData();
+
+  displayProducts();
+
+}
+
+
+function increase(index) {
+
+  products[index].quantity++;
+
+  saveData();
+
+  displayProducts();
+
+}
+
+
+function decrease(index) {
+
+  if (products[index].quantity <= 0) {
+    return;
+  }
+
+  products[index].quantity--;
+
+  saveData();
+
+  displayProducts();
+
+}
+
+
+function sell(index) {
+
+  if (products[index].quantity <= 0) {
+
+    alert("الصنف خلص من المخزون");
+
+    return;
+  }
+
+
+  if (products[index].price <= 0) {
+
+    alert(
+      "سعر البيع غير محدد.\n" +
+      "اضغط على «تعديل السعر» أولاً."
+    );
+
+    return;
+  }
+
+
+  products[index].quantity--;
+
+  sales += Number(products[index].price);
+
+  saveData();
+
+  displayProducts();
+
+
+  alert(
+    "تم تسجيل البيع بنجاح\n\n" +
+    products[index].name +
+    "\n" +
+    Number(products[index].price).toFixed(2) +
+    " جنيه"
+  );
+
+}
+
+
+function updateSummary() {
+
+  document.getElementById(
+    "totalProducts"
+  ).textContent =
+    products.length;
+
+
+  let total = 0;
+
+
+  products.forEach(product => {
+
+    total += Number(product.quantity);
+
+  });
+
+
+  document.getElementById(
+    "totalQuantity"
+  ).textContent =
+    total;
+
+
+  document.getElementById(
+    "todaySales"
+  ).textContent =
+    sales.toFixed(2) + " ج";
+
+}
+
+
+function resetData() {
+
+  const answer =
+    confirm(
+      "هل تريد إعادة الكميات للوضع الافتراضي؟\n\n" +
+      "ملاحظة: هذا سيعيد الكميات فقط."
+    );
+
+
+  if (!answer) {
+    return;
+  }
+
+
+  products =
+    products.map((product, index) => {
+
+      return {
+        ...product,
+        quantity: defaultProducts[index]
+          ? defaultProducts[index].quantity
+          : product.quantity
+      };
+
+    });
+
+
+  saveData();
+
+  displayProducts();
+
+}
+
+
+displayProducts();
+
+</script>
+
 </body>
-      </html>
+</html>
