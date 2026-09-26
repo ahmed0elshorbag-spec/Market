@@ -1,9 +1,10 @@
-const CACHE_NAME = "market-offline-v1";
+const CACHE_NAME = "market-offline-v2";
 
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
-  "./manifest.json"
+  "./manifest.json",
+  "./sw.js"
 ];
 
 self.addEventListener("install", event => {
@@ -33,7 +34,27 @@ self.addEventListener("activate", event => {
 self.addEventListener("fetch", event => {
   event.respondWith(
     caches.match(event.request).then(cachedResponse => {
-      return cachedResponse || fetch(event.request);
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      return fetch(event.request)
+        .then(response => {
+          if (!response || response.status !== 200) {
+            return response;
+          }
+
+          const responseClone = response.clone();
+
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseClone);
+          });
+
+          return response;
+        })
+        .catch(() => {
+          return caches.match("./index.html");
+        });
     })
   );
 });
