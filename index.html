@@ -1,407 +1,570 @@
-<!DOCTYPE html><html lang="ar" dir="rtl">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <meta name="theme-color" content="#0d6efd">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">  <link rel="manifest" href="manifest.json">  <title>ميني ماركت الشوربجي</title>  <style>
-    * {
-      box-sizing: border-box;
-      font-family: Arial, Tahoma, sans-serif;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0d6efd">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<title>ميني ماركت الشوربجي</title>
 
-    body {
-      margin: 0;
-      background: #f3f6f9;
-      color: #222;
-    }
+<style>
+*{box-sizing:border-box;font-family:Arial,Tahoma,sans-serif}
+body{margin:0;background:#f3f6f9;color:#222}
+header{background:linear-gradient(135deg,#0d6efd,#084298);color:white;padding:20px 15px;text-align:center;box-shadow:0 3px 10px #0002}
+header h1{margin:0;font-size:25px}
+header p{margin:8px 0 0;font-size:14px}
+.container{width:94%;max-width:900px;margin:20px auto}
+.search{width:100%;padding:14px;border:1px solid #ddd;border-radius:12px;font-size:17px;margin-bottom:15px;outline:none}
+.summary{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px}
+.box{background:white;padding:15px 8px;border-radius:12px;text-align:center;box-shadow:0 2px 8px #0001}
+.box strong{display:block;font-size:20px;color:#0d6efd;margin-top:5px}
+.product{background:white;border-radius:15px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px #0001}
+.product h3{margin:0 0 10px;font-size:20px;border-bottom:1px solid #eee;padding-bottom:10px}
+.info{font-size:16px;line-height:1.9}
+.buy{color:#6c757d;font-weight:bold}
+.sellprice{color:#198754;font-weight:bold}
+.profit{color:#0d6efd;font-weight:bold}
+.quantity{margin:8px 0;color:#555;font-size:17px}
+.quantity strong{color:#0d6efd;font-size:20px}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+button{border:none;border-radius:10px;padding:12px 8px;font-size:16px;cursor:pointer;color:white;min-height:45px}
+.minus{background:#dc3545}.plus{background:#198754}.sell{background:#0d6efd}
+.edit-price{background:#f59f00}.edit-buy{background:#6f42c1}
+.add{background:#198754;width:100%;margin-bottom:12px}
+.report{background:#212529;width:100%;margin-bottom:12px}
+.reset{background:#6c757d;width:100%;margin-top:15px}
+.empty{text-align:center;background:white;padding:30px;border-radius:15px;color:#777}
+.report-box{background:white;border-radius:15px;padding:16px;margin-bottom:15px;box-shadow:0 2px 8px #0001}
+.report-box h2{margin-top:0;color:#0d6efd;font-size:20px}
+.report-row{display:flex;justify-content:space-between;border-bottom:1px solid #eee;padding:9px 0;font-size:16px}
+.green{color:#198754;font-weight:bold}
+.blue{color:#0d6efd;font-weight:bold}
+.red{color:#dc3545;font-weight:bold}
 
-    header {
-      background: linear-gradient(135deg, #0d6efd, #084298);
-      color: white;
-      padding: 20px 15px;
-      text-align: center;
-      box-shadow: 0 3px 10px #0002;
-    }
+@media(max-width:600px){
+.summary{grid-template-columns:1fr 1fr}
+header h1{font-size:22px}
+.buttons{grid-template-columns:1fr 1fr}
+button{font-size:15px}
+}
+</style>
+</head>
 
-    header h1 {
-      margin: 0;
-      font-size: 25px;
-    }
+<body>
 
-    header p {
-      margin: 8px 0 0;
-      font-size: 14px;
-    }
+<header>
+<h1>🛒 ميني ماركت الشوربجي</h1>
+<p>إدارة المخزون والمبيعات والأرباح</p>
+</header>
 
-    .container {
-      width: 94%;
-      max-width: 900px;
-      margin: 20px auto;
-    }
+<div class="container">
 
-    .search {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      font-size: 17px;
-      margin-bottom: 15px;
-      outline: none;
-    }
+<input id="search" class="search" type="text"
+placeholder="🔎 ابحث عن الصنف..." oninput="displayProducts()">
 
-    .summary {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 18px;
-    }
+<button class="add" onclick="addProduct()">➕ إضافة صنف جديد</button>
 
-    .box {
-      background: white;
-      padding: 15px 8px;
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 2px 8px #0001;
-    }
+<button class="report" onclick="showReports()">📊 الجرد اليومي والشهري</button>
 
-    .box strong {
-      display: block;
-      font-size: 20px;
-      color: #0d6efd;
-      margin-top: 5px;
-    }
+<div id="reports"></div>
 
-    .product {
-      background: white;
-      border-radius: 15px;
-      padding: 15px;
-      margin-bottom: 12px;
-      box-shadow: 0 2px 8px #0001;
-    }
+<div class="summary">
 
-    .product h3 {
-      margin: 0 0 8px;
-      font-size: 19px;
-    }
-
-    .price {
-      color: #198754;
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
-
-    .quantity {
-      margin: 8px 0;
-      color: #555;
-    }
-
-    .buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    button {
-      border: none;
-      border-radius: 10px;
-      padding: 11px 10px;
-      font-size: 16px;
-      cursor: pointer;
-      color: white;
-    }
-
-    .minus { background: #dc3545; }
-    .plus { background: #198754; }
-    .sell { background: #0d6efd; }
-    .edit-price { background: #f59f00; }
-
-    .reset {
-      background: #6c757d;
-      width: 100%;
-      margin-top: 15px;
-    }
-
-    .empty {
-      text-align: center;
-      background: white;
-      padding: 30px;
-      border-radius: 15px;
-      color: #777;
-    }
-
-    @media (max-width: 600px) {
-      .summary {
-        grid-template-columns: 1fr;
-      }
-
-      header h1 {
-        font-size: 22px;
-      }
-    }
-  </style></head><body><header>
-  <h1>🛒 ميني ماركت الشوربجي</h1>
-  <p>إدارة المخزون والمبيعات</p>
-</header><div class="container"><input
-id="search"
-class="search"
-type="text"
-placeholder="🔎 ابحث عن الصنف..."
-oninput="displayProducts()"
-
-«»
-
-  <div class="summary"><div class="box">
-  الأصناف
-  <strong id="totalProducts">0</strong>
+<div class="box">
+الأصناف
+<strong id="totalProducts">0</strong>
 </div>
 
 <div class="box">
-  إجمالي الكمية
-  <strong id="totalQuantity">0</strong>
+إجمالي الكمية
+<strong id="totalQuantity">0</strong>
 </div>
 
 <div class="box">
-  مبيعات اليوم
-  <strong id="todaySales">0 ج</strong>
+مبيعات اليوم
+<strong id="todaySales">0 ج</strong>
 </div>
 
-  </div>  <div id="products"></div>  <button class="reset" onclick="resetData()">
-    🔄 إعادة ضبط الكميات
-  </button></div><script>
+<div class="box">
+صافي ربح اليوم
+<strong id="todayProfit">0 ج</strong>
+</div>
+
+<div class="box">
+مبيعات الشهر
+<strong id="monthSales">0 ج</strong>
+</div>
+
+<div class="box">
+صافي ربح الشهر
+<strong id="monthProfit">0 ج</strong>
+</div>
+
+</div>
+
+<div id="products"></div>
+
+<button class="reset" onclick="resetData()">
+🔄 إعادة ضبط الكميات
+</button>
+
+</div>
+
+<script>
 
 const defaultProducts = [
-  { name: "ميه صغيرة سيوه", price: 5, quantity: 20 },
-  { name: "ميه كبيرة", price: 8.30, quantity: 20 },
-  { name: "بسكوت بـ5", price: 4, quantity: 20 },
-  { name: "بسكوت بـ10", price: 8, quantity: 20 },
-  { name: "كوفي ميكس", price: 0, quantity: 20 },
-  { name: "إندومي صغير", price: 4.38, quantity: 48 },
-  { name: "شيبسي بـ10", price: 10, quantity: 20 },
-  { name: "كنز 285 مللي", price: 10, quantity: 20 },
-  { name: "عصير مانجا", price: 0, quantity: 27 },
-  { name: "عصير برتقال", price: 0, quantity: 27 },
-  { name: "عصير ميكس فراولة", price: 0, quantity: 27 }
+{name:"ميه صغيرة سيوه",buy:0,sell:5,quantity:20},
+{name:"ميه كبيرة",buy:0,sell:8.30,quantity:20},
+{name:"بسكوت بـ5",buy:4,sell:5,quantity:20},
+{name:"بسكوت بـ10",buy:8,sell:10,quantity:20},
+{name:"كوفي ميكس",buy:0,sell:0,quantity:20},
+{name:"إندومي صغير",buy:4.38,sell:0,quantity:48},
+{name:"شيبسي بـ10",buy:0,sell:10,quantity:20},
+{name:"كنز 285 مللي",buy:0,sell:10,quantity:20},
+{name:"عصير مانجا",buy:0,sell:0,quantity:27},
+{name:"عصير برتقال",buy:0,sell:0,quantity:27},
+{name:"عصير ميكس فراولة",buy:0,sell:0,quantity:27}
 ];
 
 let products =
-  JSON.parse(localStorage.getItem("marketProducts")) ||
-  JSON.parse(JSON.stringify(defaultProducts));
+JSON.parse(localStorage.getItem("marketProducts")) ||
+JSON.parse(JSON.stringify(defaultProducts));
 
-let sales =
-  Number(localStorage.getItem("marketSales")) || 0;
+let salesHistory =
+JSON.parse(localStorage.getItem("marketSalesHistory")) || [];
 
-function saveData() {
-  localStorage.setItem("marketProducts", JSON.stringify(products));
-  localStorage.setItem("marketSales", sales);
+
+/* تحويل البيانات القديمة تلقائياً */
+products = products.map(p => ({
+name:p.name,
+buy:Number(p.buy ?? 0),
+sell:Number(p.sell ?? p.price ?? 0),
+quantity:Number(p.quantity ?? 0)
+}));
+
+function saveData(){
+localStorage.setItem("marketProducts",JSON.stringify(products));
+localStorage.setItem("marketSalesHistory",JSON.stringify(salesHistory));
 }
 
-function displayProducts() {
-
-  const container = document.getElementById("products");
-
-  const search = document
-    .getElementById("search")
-    .value
-    .trim()
-    .toLowerCase();
-
-  container.innerHTML = "";
-
-  const filtered = products.filter(product =>
-    product.name.toLowerCase().includes(search)
-  );
-
-  if (filtered.length === 0) {
-    container.innerHTML =
-      '<div class="empty">لا يوجد صنف بهذا الاسم</div>';
-    updateSummary();
-    return;
-  }
-
-  filtered.forEach(product => {
-
-    const realIndex = products.indexOf(product);
-
-    const div = document.createElement("div");
-
-    div.className = "product";
-
-    div.innerHTML = `
-      <h3>${product.name}</h3>
-
-      <div class="price">
-        سعر البيع:
-        ${
-          product.price > 0
-          ? Number(product.price).toFixed(2) + " ج"
-          : "غير محدد"
-        }
-      </div>
-
-      <div class="quantity">
-        الكمية:
-        <strong>${product.quantity}</strong>
-      </div>
-
-      <div class="buttons">
-
-        <button class="edit-price"
-          onclick="editPrice(${realIndex})">
-          💰 تعديل السعر
-        </button>
-
-        <button class="sell"
-          onclick="sell(${realIndex})">
-          🛒 بيع
-        </button>
-
-        <button class="minus"
-          onclick="decrease(${realIndex})">
-          − نقص قطعة
-        </button>
-
-        <button class="plus"
-          onclick="increase(${realIndex})">
-          + زود قطعة
-        </button>
-
-      </div>
-    `;
-
-    container.appendChild(div);
-  });
-
-  updateSummary();
+function todayKey(){
+const d=new Date();
+return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 }
 
-function editPrice(index) {
-
-  const oldPrice =
-    products[index].price > 0
-      ? products[index].price
-      : "";
-
-  const newPrice = prompt(
-    "اكتب سعر البيع الجديد للصنف:\n" +
-    products[index].name,
-    oldPrice
-  );
-
-  if (newPrice === null) return;
-
-  const price = Number(newPrice.replace(",", "."));
-
-  if (
-    newPrice.trim() === "" ||
-    !Number.isFinite(price) ||
-    price < 0
-  ) {
-    alert("من فضلك اكتب سعر صحيح.");
-    return;
-  }
-
-  products[index].price = price;
-
-  saveData();
-  displayProducts();
+function monthKey(){
+const d=new Date();
+return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
 }
 
-function increase(index) {
-  products[index].quantity++;
-  saveData();
-  displayProducts();
+function displayProducts(){
+
+const container=document.getElementById("products");
+
+const search=document.getElementById("search").value.trim().toLowerCase();
+
+container.innerHTML="";
+
+const filtered=products.filter(product =>
+product.name.toLowerCase().includes(search)
+);
+
+if(filtered.length===0){
+container.innerHTML='<div class="empty">لا يوجد صنف بهذا الاسم</div>';
+updateSummary();
+return;
 }
 
-function decrease(index) {
+filtered.forEach(product=>{
 
-  if (products[index].quantity <= 0) return;
+const index=products.indexOf(product);
 
-  products[index].quantity--;
+const profit=Number(product.sell)-Number(product.buy);
 
-  saveData();
-  displayProducts();
+const div=document.createElement("div");
+
+div.className="product";
+
+div.innerHTML=`
+
+<h3>${product.name}</h3>
+
+<div class="info">
+<div class="buy">
+💰 سعر الشراء:
+${product.buy>0 ? product.buy.toFixed(2)+" ج":"غير محدد"}
+</div>
+
+<div class="sellprice">
+🏷️ سعر البيع:
+${product.sell>0 ? product.sell.toFixed(2)+" ج":"غير محدد"}
+</div>
+
+<div class="profit">
+📈 ربح القطعة:
+${profit>0 ? profit.toFixed(2)+" ج":"0.00 ج"}
+</div>
+</div>
+
+<div class="quantity">
+الكمية:
+<strong>${product.quantity}</strong>
+</div>
+
+<div class="buttons">
+
+<button class="edit-buy"
+onclick="editBuy(${index})">
+💰 تعديل الشراء
+</button>
+
+<button class="edit-price"
+onclick="editSell(${index})">
+🏷️ تعديل البيع
+</button>
+
+<button class="sell"
+onclick="sell(${index})">
+🛒 بيع
+</button>
+
+<button class="minus"
+onclick="decrease(${index})">
+− نقص قطعة
+</button>
+
+<button class="plus"
+onclick="increase(${index})">
++ زود قطعة
+</button>
+
+</div>
+`;
+
+container.appendChild(div);
+
+});
+
+updateSummary();
 }
 
-function sell(index) {
+function editBuy(index){
 
-  if (products[index].quantity <= 0) {
-    alert("الصنف خلص من المخزون");
-    return;
-  }
+const old=products[index].buy>0?products[index].buy:"";
 
-  if (products[index].price <= 0) {
-    alert(
-      "سعر البيع غير محدد.\n" +
-      "اضغط على «تعديل السعر» أولاً."
-    );
-    return;
-  }
+const value=prompt(
+"اكتب سعر الشراء للصنف:\n"+products[index].name,
+old
+);
 
-  products[index].quantity--;
-  sales += Number(products[index].price);
+if(value===null)return;
 
-  saveData();
-  displayProducts();
+const price=Number(value.replace(",","."));
 
-  alert(
-    "تم تسجيل البيع بنجاح\n\n" +
-    products[index].name +
-    "\n" +
-    Number(products[index].price).toFixed(2) +
-    " جنيه"
-  );
+if(value.trim()===""||!Number.isFinite(price)||price<0){
+alert("من فضلك اكتب سعر صحيح.");
+return;
 }
 
-function updateSummary() {
+products[index].buy=price;
 
-  document.getElementById("totalProducts").textContent =
-    products.length;
-
-  let total = 0;
-
-  products.forEach(product => {
-    total += Number(product.quantity);
-  });
-
-  document.getElementById("totalQuantity").textContent = total;
-
-  document.getElementById("todaySales").textContent =
-    sales.toFixed(2) + " ج";
+saveData();
+displayProducts();
 }
 
-function resetData() {
+function editSell(index){
 
-  const answer = confirm(
-    "هل تريد إعادة الكميات للوضع الافتراضي؟\n\n" +
-    "ملاحظة: هذا سيعيد الكميات فقط."
-  );
+const old=products[index].sell>0?products[index].sell:"";
 
-  if (!answer) return;
+const value=prompt(
+"اكتب سعر البيع للصنف:\n"+products[index].name,
+old
+);
 
-  products = products.map((product, index) => ({
-    ...product,
-    quantity: defaultProducts[index]
-      ? defaultProducts[index].quantity
-      : product.quantity
-  }));
+if(value===null)return;
 
-  saveData();
-  displayProducts();
+const price=Number(value.replace(",","."));
+
+if(value.trim()===""||!Number.isFinite(price)||price<0){
+alert("من فضلك اكتب سعر صحيح.");
+return;
+}
+
+products[index].sell=price;
+
+saveData();
+displayProducts();
+}
+
+function addProduct(){
+
+const name=prompt("اكتب اسم الصنف الجديد:");
+
+if(!name||!name.trim())return;
+
+const buyValue=prompt("اكتب سعر الشراء:");
+
+if(buyValue===null)return;
+
+const sellValue=prompt("اكتب سعر البيع:");
+
+if(sellValue===null)return;
+
+const quantityValue=prompt("اكتب الكمية الحالية:");
+
+if(quantityValue===null)return;
+
+const buy=Number(buyValue.replace(",","."));
+const sell=Number(sellValue.replace(",","."));
+const quantity=Number(quantityValue);
+
+if(
+!Number.isFinite(buy)||buy<0||
+!Number.isFinite(sell)||sell<0||
+!Number.isInteger(quantity)||quantity<0
+){
+alert("راجع الأسعار والكمية واكتب بيانات صحيحة.");
+return;
+}
+
+products.push({
+name:name.trim(),
+buy:buy,
+sell:sell,
+quantity:quantity
+});
+
+saveData();
+displayProducts();
+
+alert("تمت إضافة الصنف بنجاح.");
+}
+
+function increase(index){
+products[index].quantity++;
+saveData();
+displayProducts();
+}
+
+function decrease(index){
+
+if(products[index].quantity<=0)return;
+
+products[index].quantity--;
+
+saveData();
+displayProducts();
+}
+
+function sell(index){
+
+const p=products[index];
+
+if(p.quantity<=0){
+alert("الصنف خلص من المخزون");
+return;
+}
+
+if(p.sell<=0){
+alert("سعر البيع غير محدد.\nاضغط على تعديل البيع أولاً.");
+return;
+}
+
+if(p.buy<=0){
+const answer=confirm(
+"سعر الشراء غير محدد لهذا الصنف.\n\nهل تريد تسجيل البيع بدون حساب ربح لهذه العملية؟"
+);
+if(!answer)return;
+}
+
+p.quantity--;
+
+salesHistory.push({
+date:todayKey(),
+month:monthKey(),
+name:p.name,
+sell:Number(p.sell),
+buy:Number(p.buy),
+profit:Number(p.sell)-Number(p.buy)
+});
+
+saveData();
+displayProducts();
+
+alert(
+"تم تسجيل البيع بنجاح\n\n"+
+p.name+
+"\nسعر البيع: "+
+p.sell.toFixed(2)+" جنيه"+
+"\nربح القطعة: "+
+Math.max(0,p.sell-p.buy).toFixed(2)+" جنيه"
+);
+}
+
+function getDaySales(){
+
+const today=todayKey();
+
+return salesHistory.filter(s=>s.date===today);
+}
+
+function getMonthSales(){
+
+const month=monthKey();
+
+return salesHistory.filter(s=>s.month===month);
+}
+
+function calculate(list){
+
+let sales=0;
+let cost=0;
+let profit=0;
+
+list.forEach(s=>{
+sales+=Number(s.sell);
+cost+=Number(s.buy);
+profit+=Number(s.profit);
+});
+
+return {sales,cost,profit};
+}
+
+function updateSummary(){
+
+document.getElementById("totalProducts").textContent=products.length;
+
+let total=0;
+
+products.forEach(p=>{
+total+=Number(p.quantity);
+});
+
+document.getElementById("totalQuantity").textContent=total;
+
+const day=calculate(getDaySales());
+const month=calculate(getMonthSales());
+
+document.getElementById("todaySales").textContent=
+day.sales.toFixed(2)+" ج";
+
+document.getElementById("todayProfit").textContent=
+day.profit.toFixed(2)+" ج";
+
+document.getElementById("monthSales").textContent=
+month.sales.toFixed(2)+" ج";
+
+document.getElementById("monthProfit").textContent=
+month.profit.toFixed(2)+" ج";
+}
+
+function showReports(){
+
+const reports=document.getElementById("reports");
+
+const dayList=getDaySales();
+const monthList=getMonthSales();
+
+const day=calculate(dayList);
+const month=calculate(monthList);
+
+reports.innerHTML=`
+
+<div class="report-box">
+
+<h2>📅 الجرد اليومي</h2>
+
+<div class="report-row">
+<span>عدد القطع المباعة</span>
+<strong>${dayList.length}</strong>
+</div>
+
+<div class="report-row">
+<span>إجمالي المبيعات</span>
+<strong class="green">${day.sales.toFixed(2)} ج</strong>
+</div>
+
+<div class="report-row">
+<span>تكلفة الشراء</span>
+<strong>${day.cost.toFixed(2)} ج</strong>
+</div>
+
+<div class="report-row">
+<span>صافي الربح</span>
+<strong class="blue">${day.profit.toFixed(2)} ج</strong>
+</div>
+
+</div>
+
+<div class="report-box">
+
+<h2>📆 الجرد الشهري</h2>
+
+<div class="report-row">
+<span>عدد القطع المباعة</span>
+<strong>${monthList.length}</strong>
+</div>
+
+<div class="report-row">
+<span>إجمالي المبيعات</span>
+<strong class="green">${month.sales.toFixed(2)} ج</strong>
+</div>
+
+<div class="report-row">
+<span>تكلفة الشراء</span>
+<strong>${month.cost.toFixed(2)} ج</strong>
+</div>
+
+<div class="report-row">
+<span>صافي الربح</span>
+<strong class="blue">${month.profit.toFixed(2)} ج</strong>
+</div>
+
+</div>
+`;
+}
+
+function resetData(){
+
+const answer=confirm(
+"هل تريد إعادة الكميات للوضع الافتراضي؟\n\n"+
+"ملاحظة: سيتم إعادة الكميات فقط، ولن يتم حذف المبيعات أو الأسعار."
+);
+
+if(!answer)return;
+
+products=products.map((product,index)=>({
+...product,
+quantity:defaultProducts[index]
+?defaultProducts[index].quantity
+:product.quantity
+}));
+
+saveData();
+displayProducts();
 }
 
 
 /* تشغيل التطبيق بدون إنترنت */
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js")
-      .catch(error => {
-        console.log("Service Worker Error:", error);
-      });
-  });
+
+if("serviceWorker" in navigator){
+
+window.addEventListener("load",()=>{
+
+navigator.serviceWorker.register("./sw.js")
+.catch(error=>{
+console.log("Service Worker Error:",error);
+});
+
+});
+
 }
 
 displayProducts();
 
-</script></body>
+</script>
+
+</body>
 </html>
