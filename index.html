@@ -1,16 +1,9 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!DOCTYPE html><html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <meta name="theme-color" content="#0d6efd">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <meta name="theme-color" content="#0d6efd">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-
-  <title>ميني ماركت الشوربجي</title>
-
-  <style>
+  <meta name="apple-mobile-web-app-capable" content="yes">  <link rel="manifest" href="manifest.json">  <title>ميني ماركت الشوربجي</title>  <style>
     * {
       box-sizing: border-box;
       font-family: Arial, Tahoma, sans-serif;
@@ -54,10 +47,6 @@
       font-size: 17px;
       margin-bottom: 15px;
       outline: none;
-    }
-
-    .search:focus {
-      border-color: #0d6efd;
     }
 
     .summary {
@@ -122,21 +111,10 @@
       color: white;
     }
 
-    .minus {
-      background: #dc3545;
-    }
-
-    .plus {
-      background: #198754;
-    }
-
-    .sell {
-      background: #0d6efd;
-    }
-
-    .edit-price {
-      background: #f59f00;
-    }
+    .minus { background: #dc3545; }
+    .plus { background: #198754; }
+    .sell { background: #0d6efd; }
+    .edit-price { background: #f59f00; }
 
     .reset {
       background: #6c757d;
@@ -160,199 +138,96 @@
       header h1 {
         font-size: 22px;
       }
-
-      .product h3 {
-        font-size: 18px;
-      }
     }
-  </style>
-</head>
-
-<body>
-
-<header>
+  </style></head><body><header>
   <h1>🛒 ميني ماركت الشوربجي</h1>
   <p>إدارة المخزون والمبيعات</p>
-</header>
+</header><div class="container"><input
+id="search"
+class="search"
+type="text"
+placeholder="🔎 ابحث عن الصنف..."
+oninput="displayProducts()"
 
-<div class="container">
+«»
 
-  <input
-    id="search"
-    class="search"
-    type="text"
-    placeholder="🔎 ابحث عن الصنف..."
-    oninput="displayProducts()"
-  >
-
-  <div class="summary">
-
-    <div class="box">
-      الأصناف
-      <strong id="totalProducts">0</strong>
-    </div>
-
-    <div class="box">
-      إجمالي الكمية
-      <strong id="totalQuantity">0</strong>
-    </div>
-
-    <div class="box">
-      مبيعات اليوم
-      <strong id="todaySales">0 ج</strong>
-    </div>
-
-  </div>
-
-  <div id="products"></div>
-
-  <button class="reset" onclick="resetData()">
-    🔄 إعادة ضبط الكميات
-  </button>
-
+  <div class="summary"><div class="box">
+  الأصناف
+  <strong id="totalProducts">0</strong>
 </div>
 
-<script>
+<div class="box">
+  إجمالي الكمية
+  <strong id="totalQuantity">0</strong>
+</div>
+
+<div class="box">
+  مبيعات اليوم
+  <strong id="todaySales">0 ج</strong>
+</div>
+
+  </div>  <div id="products"></div>  <button class="reset" onclick="resetData()">
+    🔄 إعادة ضبط الكميات
+  </button></div><script>
 
 const defaultProducts = [
-
-  {
-    name: "ميه صغيرة سيوه",
-    price: 5,
-    quantity: 20
-  },
-
-  {
-    name: "ميه كبيرة",
-    price: 8.30,
-    quantity: 20
-  },
-
-  {
-    name: "بسكوت بـ5",
-    price: 4,
-    quantity: 20
-  },
-
-  {
-    name: "بسكوت بـ10",
-    price: 8,
-    quantity: 20
-  },
-
-  {
-    name: "كوفي ميكس",
-    price: 0,
-    quantity: 20
-  },
-
-  {
-    name: "إندومي صغير",
-    price: 4.38,
-    quantity: 48
-  },
-
-  {
-    name: "شيبسي بـ10",
-    price: 10,
-    quantity: 20
-  },
-
-  {
-    name: "كنز 285 مللي",
-    price: 10,
-    quantity: 20
-  },
-
-  {
-    name: "عصير مانجا",
-    price: 0,
-    quantity: 27
-  },
-
-  {
-    name: "عصير برتقال",
-    price: 0,
-    quantity: 27
-  },
-
-  {
-    name: "عصير ميكس فراولة",
-    price: 0,
-    quantity: 27
-  }
-
+  { name: "ميه صغيرة سيوه", price: 5, quantity: 20 },
+  { name: "ميه كبيرة", price: 8.30, quantity: 20 },
+  { name: "بسكوت بـ5", price: 4, quantity: 20 },
+  { name: "بسكوت بـ10", price: 8, quantity: 20 },
+  { name: "كوفي ميكس", price: 0, quantity: 20 },
+  { name: "إندومي صغير", price: 4.38, quantity: 48 },
+  { name: "شيبسي بـ10", price: 10, quantity: 20 },
+  { name: "كنز 285 مللي", price: 10, quantity: 20 },
+  { name: "عصير مانجا", price: 0, quantity: 27 },
+  { name: "عصير برتقال", price: 0, quantity: 27 },
+  { name: "عصير ميكس فراولة", price: 0, quantity: 27 }
 ];
-
 
 let products =
   JSON.parse(localStorage.getItem("marketProducts")) ||
   JSON.parse(JSON.stringify(defaultProducts));
 
-
 let sales =
   Number(localStorage.getItem("marketSales")) || 0;
 
-
 function saveData() {
-
-  localStorage.setItem(
-    "marketProducts",
-    JSON.stringify(products)
-  );
-
-  localStorage.setItem(
-    "marketSales",
-    sales
-  );
-
+  localStorage.setItem("marketProducts", JSON.stringify(products));
+  localStorage.setItem("marketSales", sales);
 }
-
 
 function displayProducts() {
 
-  const container =
-    document.getElementById("products");
+  const container = document.getElementById("products");
 
-  const search =
-    document
-      .getElementById("search")
-      .value
-      .trim()
-      .toLowerCase();
+  const search = document
+    .getElementById("search")
+    .value
+    .trim()
+    .toLowerCase();
 
   container.innerHTML = "";
 
-  const filtered =
-    products.filter(product =>
-      product.name.toLowerCase().includes(search)
-    );
-
+  const filtered = products.filter(product =>
+    product.name.toLowerCase().includes(search)
+  );
 
   if (filtered.length === 0) {
-
     container.innerHTML =
       '<div class="empty">لا يوجد صنف بهذا الاسم</div>';
-
     updateSummary();
-
     return;
   }
 
+  filtered.forEach(product => {
 
-  filtered.forEach((product) => {
+    const realIndex = products.indexOf(product);
 
-    const realIndex =
-      products.indexOf(product);
-
-    const div =
-      document.createElement("div");
+    const div = document.createElement("div");
 
     div.className = "product";
 
-
     div.innerHTML = `
-
       <h3>${product.name}</h3>
 
       <div class="price">
@@ -371,43 +246,34 @@ function displayProducts() {
 
       <div class="buttons">
 
-        <button
-          class="edit-price"
+        <button class="edit-price"
           onclick="editPrice(${realIndex})">
           💰 تعديل السعر
         </button>
 
-        <button
-          class="sell"
+        <button class="sell"
           onclick="sell(${realIndex})">
           🛒 بيع
         </button>
 
-        <button
-          class="minus"
+        <button class="minus"
           onclick="decrease(${realIndex})">
           − نقص قطعة
         </button>
 
-        <button
-          class="plus"
+        <button class="plus"
           onclick="increase(${realIndex})">
           + زود قطعة
         </button>
 
       </div>
-
     `;
 
     container.appendChild(div);
-
   });
 
-
   updateSummary();
-
 }
-
 
 function editPrice(index) {
 
@@ -416,101 +282,67 @@ function editPrice(index) {
       ? products[index].price
       : "";
 
-  const newPrice =
-    prompt(
-      "اكتب سعر البيع الجديد للصنف:\n" +
-      products[index].name,
-      oldPrice
-    );
+  const newPrice = prompt(
+    "اكتب سعر البيع الجديد للصنف:\n" +
+    products[index].name,
+    oldPrice
+  );
 
+  if (newPrice === null) return;
 
-  if (newPrice === null) {
-    return;
-  }
-
-
-  const price =
-    Number(
-      newPrice.replace(",", ".")
-    );
-
+  const price = Number(newPrice.replace(",", "."));
 
   if (
     newPrice.trim() === "" ||
     !Number.isFinite(price) ||
     price < 0
   ) {
-
     alert("من فضلك اكتب سعر صحيح.");
-
     return;
   }
-
 
   products[index].price = price;
 
   saveData();
-
   displayProducts();
-
 }
-
 
 function increase(index) {
-
   products[index].quantity++;
-
   saveData();
-
   displayProducts();
-
 }
-
 
 function decrease(index) {
 
-  if (products[index].quantity <= 0) {
-    return;
-  }
+  if (products[index].quantity <= 0) return;
 
   products[index].quantity--;
 
   saveData();
-
   displayProducts();
-
 }
-
 
 function sell(index) {
 
   if (products[index].quantity <= 0) {
-
     alert("الصنف خلص من المخزون");
-
     return;
   }
 
-
   if (products[index].price <= 0) {
-
     alert(
       "سعر البيع غير محدد.\n" +
       "اضغط على «تعديل السعر» أولاً."
     );
-
     return;
   }
 
-
   products[index].quantity--;
-
   sales += Number(products[index].price);
 
   saveData();
-
   displayProducts();
-
 
   alert(
     "تم تسجيل البيع بنجاح\n\n" +
@@ -519,79 +351,57 @@ function sell(index) {
     Number(products[index].price).toFixed(2) +
     " جنيه"
   );
-
 }
-
 
 function updateSummary() {
 
-  document.getElementById(
-    "totalProducts"
-  ).textContent =
+  document.getElementById("totalProducts").textContent =
     products.length;
-
 
   let total = 0;
 
-
   products.forEach(product => {
-
     total += Number(product.quantity);
-
   });
 
+  document.getElementById("totalQuantity").textContent = total;
 
-  document.getElementById(
-    "totalQuantity"
-  ).textContent =
-    total;
-
-
-  document.getElementById(
-    "todaySales"
-  ).textContent =
+  document.getElementById("todaySales").textContent =
     sales.toFixed(2) + " ج";
-
 }
-
 
 function resetData() {
 
-  const answer =
-    confirm(
-      "هل تريد إعادة الكميات للوضع الافتراضي؟\n\n" +
-      "ملاحظة: هذا سيعيد الكميات فقط."
-    );
+  const answer = confirm(
+    "هل تريد إعادة الكميات للوضع الافتراضي؟\n\n" +
+    "ملاحظة: هذا سيعيد الكميات فقط."
+  );
 
+  if (!answer) return;
 
-  if (!answer) {
-    return;
-  }
-
-
-  products =
-    products.map((product, index) => {
-
-      return {
-        ...product,
-        quantity: defaultProducts[index]
-          ? defaultProducts[index].quantity
-          : product.quantity
-      };
-
-    });
-
+  products = products.map((product, index) => ({
+    ...product,
+    quantity: defaultProducts[index]
+      ? defaultProducts[index].quantity
+      : product.quantity
+  }));
 
   saveData();
-
   displayProducts();
-
 }
 
 
+/* تشغيل التطبيق بدون إنترنت */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js")
+      .catch(error => {
+        console.log("Service Worker Error:", error);
+      });
+  });
+}
+
 displayProducts();
 
-</script>
-
-</body>
+</script></body>
 </html>
