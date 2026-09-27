@@ -1,473 +1,1262 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة الماركت</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --success: #10b981;
-            --danger: #ef4444;
-            --bg-body: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --radius: 16px;
-            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Cairo', sans-serif;
-        }
+<title>ماركت الشوربجي</title>
 
-        body {
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            padding: 16px;
-            padding-bottom: 40px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-        /* الكروت والبطاقات */
-        .report-box {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-        }
+<style>
 
-        .report-box h2 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+:root{
+    --primary:#2563eb;
+    --primary-dark:#1d4ed8;
+    --success:#059669;
+    --danger:#dc2626;
+    --warning:#f59e0b;
 
-        .report-date {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 16px;
-            font-weight: 600;
-        }
+    --bg:#f1f5f9;
+    --card:#ffffff;
 
-        /* صفوف البيانات */
-        .report-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px dashed var(--border);
-            font-size: 0.95rem;
-        }
+    --text:#0f172a;
+    --muted:#64748b;
+    --border:#e2e8f0;
 
-        .report-row:last-of-type {
-            border-bottom: none;
-        }
+    --radius:20px;
+    --shadow:0 8px 30px rgba(15,23,42,.07);
+}
 
-        .report-row span {
-            color: var(--text-muted);
-            font-weight: 600;
-        }
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:'Cairo',sans-serif;
+}
 
-        .report-row strong {
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
+body{
+    background:
+        linear-gradient(180deg,#eaf1ff 0,#f8fafc 230px);
+    color:var(--text);
+    padding:14px;
+    padding-bottom:40px;
+    max-width:650px;
+    margin:auto;
+}
 
-        .green { color: var(--success); }
-        .blue { color: var(--primary); }
-        .red { color: var(--danger); }
+/* =========================================
+   رأس البرنامج
+========================================= */
 
-        .sold-title {
-            font-weight: 700;
-            margin: 18px 0 12px 0;
-            font-size: 0.95rem;
-            color: var(--text-main);
-        }
+.app-header{
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);
+    color:#fff;
+    border-radius:24px;
+    padding:20px;
+    margin-bottom:16px;
+    box-shadow:0 12px 30px rgba(37,99,235,.22);
+    position:relative;
+    overflow:hidden;
+}
 
-        /* قوائم الأصناف المباعة */
-        .sold-item {
-            background: #f1f5f9;
-            border-radius: 12px;
-            padding: 12px 16px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+.app-header::after{
+    content:"";
+    position:absolute;
+    width:150px;
+    height:150px;
+    border-radius:50%;
+    background:rgba(255,255,255,.08);
+    left:-50px;
+    top:-70px;
+}
 
-        .sold-item strong {
-            font-size: 0.95rem;
-        }
+.header-content{
+    position:relative;
+    z-index:2;
+}
 
-        .sold-item small {
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            display: inline-block;
-            margin-top: 2px;
-        }
+.header-title{
+    font-size:1.35rem;
+    font-weight:800;
+}
 
-        .month-day {
-            background: #f8fafc;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 14px;
-            margin-top: 14px;
-        }
+.header-subtitle{
+    margin-top:3px;
+    font-size:.82rem;
+    opacity:.85;
+}
 
-        .month-day-title {
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 10px;
-            font-size: 0.9rem;
-        }
+/* =========================================
+   عنوان القسم
+========================================= */
 
-        hr {
-            border: none;
-            border-top: 1px solid var(--border);
-            margin: 16px 0;
-        }
-    </style>
+.section-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin:18px 3px 10px;
+}
+
+.section-title h2{
+    font-size:1.05rem;
+    font-weight:800;
+}
+
+.section-title span{
+    font-size:.75rem;
+    color:var(--muted);
+}
+
+/* =========================================
+   الكارت الرئيسي
+========================================= */
+
+.report-box{
+    background:var(--card);
+    border:1px solid rgba(226,232,240,.8);
+    border-radius:var(--radius);
+    padding:17px;
+    margin-bottom:16px;
+    box-shadow:var(--shadow);
+}
+
+/* =========================================
+   عنوان الكارت
+========================================= */
+
+.card-header{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    margin-bottom:15px;
+}
+
+.card-icon{
+    width:43px;
+    height:43px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:21px;
+    background:#eff6ff;
+}
+
+.card-title{
+    flex:1;
+}
+
+.card-title h2{
+    font-size:1.02rem;
+    font-weight:800;
+}
+
+.card-title small{
+    display:block;
+    color:var(--muted);
+    font-size:.72rem;
+    margin-top:2px;
+}
+
+/* =========================================
+   التاريخ
+========================================= */
+
+.report-date{
+    background:#f8fafc;
+    border-radius:12px;
+    padding:9px 12px;
+    color:var(--muted);
+    font-size:.76rem;
+    font-weight:600;
+    margin-bottom:14px;
+    border:1px solid var(--border);
+}
+
+/* =========================================
+   إحصائيات سريعة
+========================================= */
+
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px;
+    margin-bottom:16px;
+}
+
+.stat-card{
+    border-radius:16px;
+    padding:13px 8px;
+    text-align:center;
+    border:1px solid var(--border);
+    background:#f8fafc;
+}
+
+.stat-icon{
+    font-size:18px;
+    margin-bottom:4px;
+}
+
+.stat-label{
+    display:block;
+    color:var(--muted);
+    font-size:.68rem;
+    font-weight:600;
+}
+
+.stat-value{
+    display:block;
+    font-size:.95rem;
+    font-weight:800;
+    margin-top:3px;
+}
+
+.stat-sales{
+    background:#ecfdf5;
+    border-color:#d1fae5;
+}
+
+.stat-profit{
+    background:#eff6ff;
+    border-color:#dbeafe;
+}
+
+.stat-count{
+    background:#fff7ed;
+    border-color:#fed7aa;
+}
+
+.green{
+    color:var(--success);
+}
+
+.blue{
+    color:var(--primary);
+}
+
+.red{
+    color:var(--danger);
+}
+
+/* =========================================
+   صفوف البيانات
+========================================= */
+
+.report-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:11px 2px;
+    border-bottom:1px dashed var(--border);
+    font-size:.84rem;
+}
+
+.report-row:last-of-type{
+    border-bottom:none;
+}
+
+.report-row span{
+    color:var(--muted);
+    font-weight:600;
+}
+
+.report-row strong{
+    font-size:.94rem;
+    font-weight:800;
+}
+
+/* =========================================
+   عنوان الأصناف
+========================================= */
+
+.sold-title{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-weight:800;
+    font-size:.88rem;
+    margin:17px 0 10px;
+}
+
+.sold-title::before{
+    content:"";
+    width:4px;
+    height:17px;
+    background:var(--primary);
+    border-radius:10px;
+}
+
+/* =========================================
+   الصنف المباع
+========================================= */
+
+.sold-item{
+    background:#f8fafc;
+    border:1px solid var(--border);
+    border-radius:15px;
+    padding:12px;
+    margin-bottom:9px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+}
+
+.sold-info{
+    min-width:0;
+}
+
+.sold-item strong{
+    font-size:.85rem;
+    font-weight:800;
+}
+
+.sold-item small{
+    display:block;
+    color:var(--muted);
+    font-size:.69rem;
+    margin-top:4px;
+    line-height:1.7;
+}
+
+.profit-badge{
+    background:#eff6ff;
+    color:var(--primary);
+    border-radius:11px;
+    padding:7px 9px;
+    font-size:.74rem;
+    font-weight:800;
+    white-space:nowrap;
+}
+
+/* =========================================
+   الجرد الشهري
+========================================= */
+
+.month-day{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:17px;
+    padding:13px;
+    margin-top:12px;
+}
+
+.month-day-title{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    background:#eff6ff;
+    color:var(--primary);
+    border-radius:12px;
+    padding:9px 11px;
+    margin-bottom:8px;
+    font-size:.8rem;
+    font-weight:800;
+}
+
+/* =========================================
+   الخط الفاصل
+========================================= */
+
+hr{
+    border:none;
+    border-top:1px solid var(--border);
+    margin:17px 0;
+}
+
+/* =========================================
+   حالة عدم وجود مبيعات
+========================================= */
+
+.empty-state{
+    text-align:center;
+    padding:20px 10px;
+    color:var(--muted);
+    background:#f8fafc;
+    border:1px dashed var(--border);
+    border-radius:15px;
+    font-size:.78rem;
+}
+
+/* =========================================
+   موبايل صغير
+========================================= */
+
+@media(max-width:380px){
+
+    body{
+        padding:10px;
+    }
+
+    .stats-grid{
+        gap:6px;
+    }
+
+    .stat-card{
+        padding:11px 5px;
+    }
+
+    .stat-value{
+        font-size:.82rem;
+    }
+
+    .report-box{
+        padding:14px;
+    }
+
+}
+
+</style>
 </head>
+
 <body>
 
-    <div id="reports"></div>
+<div id="reports"></div>
 
 <script>
+
 /* =========================================
    1. دوال مساعدة لتأمين وتنسيق البيانات
 ========================================= */
 
-function escapeHtml(str) {
-    if (!str) return "";
+function escapeHtml(str){
+
+    if(!str) return "";
+
     return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
 }
 
-function money(amount) {
+function money(amount){
+
     const num = Number(amount) || 0;
+
     return num.toFixed(2) + " ج";
 }
 
-function getFormattedDate(dateObj = new Date()) {
+function getFormattedDate(dateObj = new Date()){
+
     return dateObj.toISOString().split("T")[0];
 }
 
-function saveProductsData() {
-    try {
-        if (typeof saveProducts === "function") {
+function saveProductsData(){
+
+    try{
+
+        if(typeof saveProducts === "function"){
+
             saveProducts();
-        } else if (typeof products !== "undefined" && Array.isArray(products)) {
-            localStorage.setItem("products", JSON.stringify(products));
+
+        }else if(
+            typeof products !== "undefined" &&
+            Array.isArray(products)
+        ){
+
+            localStorage.setItem(
+                "products",
+                JSON.stringify(products)
+            );
         }
-    } catch (error) {
-        console.error("خطأ في حفظ المخزون:", error);
+
+    }catch(error){
+
+        console.error("خطأ في حفظ المخزون:",error);
+
     }
 }
+
 
 /* =========================================
    2. إدارة المبيعات والمخزون
 ========================================= */
 
-function sellProduct(product, salePrice = null) {
-    if (!product) return false;
+function sellProduct(product,salePrice=null){
+
+    if(!product) return false;
 
     const quantity = Number(product.quantity) || 0;
     const buy = Number(product.buy) || 0;
 
     let sell;
-    if (salePrice !== null && salePrice !== undefined && salePrice !== "") {
+
+    if(
+        salePrice !== null &&
+        salePrice !== undefined &&
+        salePrice !== ""
+    ){
+
         sell = Number(salePrice);
-    } else {
-        sell = Number(product.sell) || Number(product.price) || 0;
+
+    }else{
+
+        sell =
+            Number(product.sell) ||
+            Number(product.price) ||
+            0;
     }
 
-    if (quantity <= 0) {
+    if(quantity <= 0){
+
         alert("الصنف غير متوفر في المخزون");
+
         return false;
     }
 
     product.quantity = quantity - 1;
 
-    if (!Array.isArray(window.sales)) {
+    if(!Array.isArray(window.sales)){
+
         window.sales = [];
     }
 
     const now = new Date();
 
     window.sales.push({
-        name: product.name || "",
-        buy: buy,
-        sell: sell,
-        profit: sell - buy,
-        quantity: 1,
-        date: getFormattedDate(now),
-        timestamp: now.toISOString()
+
+        name:product.name || "",
+
+        buy:buy,
+
+        sell:sell,
+
+        profit:sell - buy,
+
+        quantity:1,
+
+        date:getFormattedDate(now),
+
+        timestamp:now.toISOString()
+
     });
 
     saveProductsData();
+
     showReports();
+
     return true;
 }
 
-function sellProductByIndex(index, salePrice = null) {
-    if (typeof products === "undefined" || !Array.isArray(products) || index < 0 || index >= products.length) {
+
+function sellProductByIndex(index,salePrice=null){
+
+    if(
+        typeof products === "undefined" ||
+        !Array.isArray(products) ||
+        index < 0 ||
+        index >= products.length
+    ){
+
         return false;
     }
-    return sellProduct(products[index], salePrice);
+
+    return sellProduct(products[index],salePrice);
 }
 
-function sellProductByName(name, salePrice = null) {
-    if (typeof products === "undefined" || !Array.isArray(products)) {
+
+function sellProductByName(name,salePrice=null){
+
+    if(
+        typeof products === "undefined" ||
+        !Array.isArray(products)
+    ){
+
         return false;
     }
 
-    const product = products.find(p => String(p.name || "").trim() === String(name || "").trim());
+    const product = products.find(
 
-    if (!product) {
+        p =>
+        String(p.name || "").trim() ===
+        String(name || "").trim()
+
+    );
+
+    if(!product){
+
         alert("الصنف غير موجود");
+
         return false;
     }
 
-    return sellProduct(product, salePrice);
+    return sellProduct(product,salePrice);
 }
 
-function decreaseProductQuantity(product) {
-    if (!product) return false;
-    const quantity = Number(product.quantity) || 0;
-    if (quantity <= 0) return false;
+
+function decreaseProductQuantity(product){
+
+    if(!product) return false;
+
+    const quantity =
+        Number(product.quantity) || 0;
+
+    if(quantity <= 0) return false;
 
     product.quantity = quantity - 1;
+
     saveProductsData();
+
     showReports();
+
     return true;
 }
 
-function increaseProductQuantity(product, amount = 1) {
-    if (!product) return false;
+
+function increaseProductQuantity(product,amount=1){
+
+    if(!product) return false;
+
     const add = Number(amount) || 0;
-    if (add <= 0) return false;
 
-    const quantity = Number(product.quantity) || 0;
-    product.quantity = quantity + add;
+    if(add <= 0) return false;
+
+    const quantity =
+        Number(product.quantity) || 0;
+
+    product.quantity =
+        quantity + add;
+
     saveProductsData();
+
     showReports();
+
     return true;
 }
+
 
 /* =========================================
-   3. دوال الحسابات للتقارير
+   3. دوال الحسابات
 ========================================= */
 
-function getDaySales() {
-    if (!Array.isArray(window.sales)) return [];
-    const today = getFormattedDate();
-    return window.sales.filter(s => s.date === today);
+function getDaySales(){
+
+    if(!Array.isArray(window.sales))
+        return [];
+
+    const today =
+        getFormattedDate();
+
+    return window.sales.filter(
+        s => s.date === today
+    );
 }
 
-function getMonthSales() {
-    if (!Array.isArray(window.sales)) return [];
-    const currentMonth = new Date().toISOString().slice(0, 7);
-    return window.sales.filter(s => s.date && s.date.startsWith(currentMonth));
+
+function getMonthSales(){
+
+    if(!Array.isArray(window.sales))
+        return [];
+
+    const currentMonth =
+        new Date()
+        .toISOString()
+        .slice(0,7);
+
+    return window.sales.filter(
+
+        s =>
+        s.date &&
+        s.date.startsWith(currentMonth)
+
+    );
 }
 
-function calculateSalesStats(salesList) {
+
+function calculateSalesStats(salesList){
+
     let count = 0;
     let sales = 0;
     let profit = 0;
 
-    if (Array.isArray(salesList)) {
+    if(Array.isArray(salesList)){
+
         salesList.forEach(s => {
-            const qty = Number(s.quantity) || 1;
-            const sellPrice = Number(s.sell) || 0;
-            const buyPrice = Number(s.buy) || 0;
-            const itemProfit = Number(s.profit) !== undefined && !isNaN(s.profit)
+
+            const qty =
+                Number(s.quantity) || 1;
+
+            const sellPrice =
+                Number(s.sell) || 0;
+
+            const buyPrice =
+                Number(s.buy) || 0;
+
+            const itemProfit =
+                Number(s.profit) !== undefined &&
+                !isNaN(s.profit)
+
                 ? Number(s.profit)
+
                 : (sellPrice - buyPrice);
 
             count += qty;
-            sales += sellPrice * qty;
-            profit += itemProfit * qty;
+
+            sales +=
+                sellPrice * qty;
+
+            profit +=
+                itemProfit * qty;
+
         });
     }
 
-    return { count, sales, profit };
+    return {
+        count,
+        sales,
+        profit
+    };
 }
 
+
 /* =========================================
-   4. عرض التقارير والجرد (بدون تكلفة البضاعة)
+   4. عرض التقارير
 ========================================= */
 
-function showReports() {
-    const reports = document.getElementById("reports");
-    if (!reports) return;
+function showReports(){
 
-    const dayList = getDaySales();
-    const monthList = getMonthSales();
+    const reports =
+        document.getElementById("reports");
 
-    const day = calculateSalesStats(dayList);
-    const month = calculateSalesStats(monthList);
+    if(!reports) return;
 
-    const todayDate = new Date();
-    const formattedToday = todayDate.toLocaleDateString("ar-EG", { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-    });
+    const dayList =
+        getDaySales();
+
+    const monthList =
+        getMonthSales();
+
+    const day =
+        calculateSalesStats(dayList);
+
+    const month =
+        calculateSalesStats(monthList);
+
+
+    const todayDate =
+        new Date();
+
+    const formattedToday =
+        todayDate.toLocaleDateString(
+            "ar-EG",
+            {
+                weekday:"long",
+                year:"numeric",
+                month:"long",
+                day:"numeric"
+            }
+        );
+
+
+    /* =====================================
+       مبيعات اليوم
+    ===================================== */
 
     let soldHTML = "";
 
-    if (!Array.isArray(dayList) || dayList.length === 0) {
-        soldHTML = '<div class="sold-item" style="color: var(--text-muted); text-align: center;">لا توجد مبيعات اليوم</div>';
-    } else {
+    if(
+        !Array.isArray(dayList) ||
+        dayList.length === 0
+    ){
+
+        soldHTML = `
+            <div class="empty-state">
+                لا توجد مبيعات اليوم
+            </div>
+        `;
+
+    }else{
+
         dayList.forEach(s => {
-            const quantity = Number(s.quantity) || 1;
-            const buy = Number(s.buy) || 0;
-            const sell = Number(s.sell) || 0;
-            const profit = Number(s.profit) !== undefined && !isNaN(s.profit) 
-                ? Number(s.profit) 
+
+            const quantity =
+                Number(s.quantity) || 1;
+
+            const buy =
+                Number(s.buy) || 0;
+
+            const sell =
+                Number(s.sell) || 0;
+
+            const profit =
+                Number(s.profit) !== undefined &&
+                !isNaN(s.profit)
+
+                ? Number(s.profit)
+
                 : (sell - buy);
 
+
             soldHTML += `
+
             <div class="sold-item">
-                <div>
-                    <strong>${escapeHtml(s.name)}</strong><br>
-                    <small>الكمية: ${quantity} | شراء: ${money(buy)} | بيع: ${money(sell)}</small>
+
+                <div class="sold-info">
+
+                    <strong>
+                        ${escapeHtml(s.name)}
+                    </strong>
+
+                    <small>
+                        الكمية: ${quantity}
+                        &nbsp;•&nbsp;
+                        شراء: ${money(buy)}
+                        &nbsp;•&nbsp;
+                        بيع: ${money(sell)}
+                    </small>
+
                 </div>
-                <strong class="blue">${money(profit * quantity)}</strong>
-            </div>`;
+
+                <div class="profit-badge">
+                    ربح ${money(profit * quantity)}
+                </div>
+
+            </div>
+
+            `;
         });
     }
+
+
+    /* =====================================
+       تجميع الشهر
+    ===================================== */
 
     const days = {};
+
     monthList.forEach(s => {
-        if (!days[s.date]) days[s.date] = [];
+
+        if(!days[s.date])
+            days[s.date] = [];
+
         days[s.date].push(s);
+
     });
 
-    let monthlyHTML = "";
-    const sortedDates = Object.keys(days).sort().reverse();
 
-    if (sortedDates.length === 0) {
-        monthlyHTML = '<div class="sold-item" style="color: var(--text-muted); text-align: center;">لا توجد مبيعات هذا الشهر</div>';
-    } else {
+    let monthlyHTML = "";
+
+    const sortedDates =
+        Object.keys(days)
+        .sort()
+        .reverse();
+
+
+    if(sortedDates.length === 0){
+
+        monthlyHTML = `
+            <div class="empty-state">
+                لا توجد مبيعات هذا الشهر
+            </div>
+        `;
+
+    }else{
+
         sortedDates.forEach(date => {
-            const list = days[date];
-            const stats = calculateSalesStats(list);
+
+            const list =
+                days[date];
+
+            const stats =
+                calculateSalesStats(list);
+
 
             const productsMap = {};
+
+
             list.forEach(s => {
-                const name = s.name || "بدون اسم";
-                if (!productsMap[name]) {
-                    productsMap[name] = { quantity: 0, buyTotal: 0, sellTotal: 0, profitTotal: 0 };
+
+                const name =
+                    s.name || "بدون اسم";
+
+                if(!productsMap[name]){
+
+                    productsMap[name] = {
+
+                        quantity:0,
+                        buyTotal:0,
+                        sellTotal:0,
+                        profitTotal:0
+
+                    };
                 }
-                const qty = Number(s.quantity) || 1;
-                const buy = Number(s.buy) || 0;
-                const sell = Number(s.sell) || 0;
-                const profit = Number(s.profit) !== undefined && !isNaN(s.profit) 
-                    ? Number(s.profit) 
+
+
+                const qty =
+                    Number(s.quantity) || 1;
+
+                const buy =
+                    Number(s.buy) || 0;
+
+                const sell =
+                    Number(s.sell) || 0;
+
+                const profit =
+                    Number(s.profit) !== undefined &&
+                    !isNaN(s.profit)
+
+                    ? Number(s.profit)
+
                     : (sell - buy);
 
+
                 productsMap[name].quantity += qty;
-                productsMap[name].buyTotal += buy * qty;
-                productsMap[name].sellTotal += sell * qty;
-                productsMap[name].profitTotal += profit * qty;
+
+                productsMap[name].buyTotal +=
+                    buy * qty;
+
+                productsMap[name].sellTotal +=
+                    sell * qty;
+
+                productsMap[name].profitTotal +=
+                    profit * qty;
+
             });
+
 
             let itemsHTML = "";
-            Object.keys(productsMap).forEach(name => {
-                const p = productsMap[name];
+
+
+            Object.keys(productsMap)
+            .forEach(name => {
+
+                const p =
+                    productsMap[name];
+
 
                 itemsHTML += `
+
                 <div class="sold-item">
-                    <div>
-                        <strong>${escapeHtml(name)}</strong><br>
-                        <small>الكمية: ${p.quantity}</small>
+
+                    <div class="sold-info">
+
+                        <strong>
+                            ${escapeHtml(name)}
+                        </strong>
+
+                        <small>
+                            الكمية المباعة: ${p.quantity}
+                        </small>
+
                     </div>
-                    <strong class="blue">${money(p.profitTotal)}</strong>
-                </div>`;
+
+                    <div class="profit-badge">
+                        ربح ${money(p.profitTotal)}
+                    </div>
+
+                </div>
+
+                `;
+
             });
 
+
             monthlyHTML += `
+
             <div class="month-day">
-                <div class="month-day-title">📅 ${escapeHtml(date)}</div>
-                <div class="report-row"><span>عدد القطع المباعة</span><strong>${stats.count}</strong></div>
-                <div class="report-row"><span>إجمالي المبيعات</span><strong class="green">${money(stats.sales)}</strong></div>
-                <div class="report-row"><span>صافي الربح</span><strong class="blue">${money(stats.profit)}</strong></div>
-                <div class="sold-title">الأصناف المباعة:</div>
+
+                <div class="month-day-title">
+                    📅 ${escapeHtml(date)}
+                </div>
+
+
+                <div class="report-row">
+
+                    <span>
+                        عدد القطع المباعة
+                    </span>
+
+                    <strong>
+                        ${stats.count}
+                    </strong>
+
+                </div>
+
+
+                <div class="report-row">
+
+                    <span>
+                        إجمالي المبيعات
+                    </span>
+
+                    <strong class="green">
+                        ${money(stats.sales)}
+                    </strong>
+
+                </div>
+
+
+                <div class="report-row">
+
+                    <span>
+                        صافي الربح
+                    </span>
+
+                    <strong class="blue">
+                        ${money(stats.profit)}
+                    </strong>
+
+                </div>
+
+
+                <div class="sold-title">
+                    الأصناف المباعة
+                </div>
+
                 ${itemsHTML}
-            </div>`;
+
+            </div>
+
+            `;
+
         });
     }
 
+
+    /* =====================================
+       الواجهة الجديدة
+    ===================================== */
+
     reports.innerHTML = `
-    <div class="report-box">
-        <h2>📅 جرد اليوم</h2>
-        <div class="report-date">${formattedToday}</div>
-        
-        <div class="report-row">
-            <span>عدد القطع المباعة</span>
-            <strong>${day.count}</strong>
+
+    <header class="app-header">
+
+        <div class="header-content">
+
+            <div class="header-title">
+                🛒 ماركت الشوربجي
+            </div>
+
+            <div class="header-subtitle">
+                لوحة متابعة المبيعات والأرباح
+            </div>
+
         </div>
-        
-        <div class="report-row">
-            <span>إجمالي المبيعات</span>
-            <strong class="green">${money(day.sales)}</strong>
-        </div>
-        
-        <div class="report-row">
-            <span>صافي الربح</span>
-            <strong class="blue">${money(day.profit)}</strong>
-        </div>
-        
-        <div class="sold-title">الأصناف المباعة بالتفصيل:</div>
-        ${soldHTML}
+
+    </header>
+
+
+    <div class="section-title">
+
+        <h2>
+            📊 ملخص اليوم
+        </h2>
+
+        <span>
+            ${day.count} قطعة
+        </span>
+
     </div>
 
+
     <div class="report-box">
-        <h2>📆 الجرد الشهري</h2>
-        
-        <div class="report-row">
-            <span>إجمالي القطع المباعة</span>
-            <strong>${month.count}</strong>
+
+        <div class="card-header">
+
+            <div class="card-icon">
+                📅
+            </div>
+
+            <div class="card-title">
+
+                <h2>
+                    جرد اليوم
+                </h2>
+
+                <small>
+                    ملخص حركة البيع اليوم
+                </small>
+
+            </div>
+
         </div>
-        
-        <div class="report-row">
-            <span>إجمالي المبيعات</span>
-            <strong class="green">${money(month.sales)}</strong>
+
+
+        <div class="report-date">
+            ${formattedToday}
         </div>
-        
-        <div class="report-row">
-            <span>إجمالي صافي الربح</span>
-            <strong class="blue">${month.profit}</strong>
+
+
+        <div class="stats-grid">
+
+            <div class="stat-card stat-count">
+
+                <div class="stat-icon">
+                    🛍️
+                </div>
+
+                <span class="stat-label">
+                    القطع
+                </span>
+
+                <strong class="stat-value">
+                    ${day.count}
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card stat-sales">
+
+                <div class="stat-icon">
+                    💰
+                </div>
+
+                <span class="stat-label">
+                    المبيعات
+                </span>
+
+                <strong class="stat-value green">
+                    ${money(day.sales)}
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card stat-profit">
+
+                <div class="stat-icon">
+                    📈
+                </div>
+
+                <span class="stat-label">
+                    الربح
+                </span>
+
+                <strong class="stat-value blue">
+                    ${money(day.profit)}
+                </strong>
+
+            </div>
+
         </div>
-        
+
+
+        <div class="sold-title">
+            الأصناف المباعة بالتفصيل
+        </div>
+
+        ${soldHTML}
+
+    </div>
+
+
+    <div class="section-title">
+
+        <h2>
+            📆 متابعة الشهر
+        </h2>
+
+        <span>
+            ${month.count} قطعة
+        </span>
+
+    </div>
+
+
+    <div class="report-box">
+
+        <div class="card-header">
+
+            <div class="card-icon">
+                📊
+            </div>
+
+            <div class="card-title">
+
+                <h2>
+                    الجرد الشهري
+                </h2>
+
+                <small>
+                    ملخص المبيعات والأرباح خلال الشهر
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <div class="stats-grid">
+
+            <div class="stat-card stat-count">
+
+                <div class="stat-icon">
+                    🛍️
+                </div>
+
+                <span class="stat-label">
+                    القطع
+                </span>
+
+                <strong class="stat-value">
+                    ${month.count}
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card stat-sales">
+
+                <div class="stat-icon">
+                    💵
+                </div>
+
+                <span class="stat-label">
+                    المبيعات
+                </span>
+
+                <strong class="stat-value green">
+                    ${money(month.sales)}
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card stat-profit">
+
+                <div class="stat-icon">
+                    📈
+                </div>
+
+                <span class="stat-label">
+                    الربح
+                </span>
+
+                <strong class="stat-value blue">
+                    ${money(month.profit)}
+                </strong>
+
+            </div>
+
+        </div>
+
+
         <hr>
+
         ${monthlyHTML}
-    </div>`;
+
+    </div>
+
+    `;
+
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    showReports();
-});
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function(){
+
+        showReports();
+
+    }
+);
+
 </script>
+
 </body>
 </html>
